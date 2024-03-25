@@ -13,7 +13,6 @@ public class TestRace {
         race.addHorse(horse4, 4);
         race.addHorse(horse5, 5);
         race.startRace();
-
     }
 
     // tests winner

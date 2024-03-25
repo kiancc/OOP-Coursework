@@ -1,0 +1,15 @@
+I've implemented Encapsulation by setting the classes fields to private. This prevents any access to the fields from outside of the class. Public getter and mutator methods are used 
+to access and modify the data. This ensures that data can be accessed and modified only as intended by the programmer (i.e. me). 
+These fields are initialised by passing horseSymbol, horseName and horseConfidence to the constructor. The constructor assigns these values to the relevant fields,
+and setes distanceTravelled to 0, and fallen to false. 
+
+The following getter methods have been defined as public in order to access the data from outside the class:
+getConfidence()
+getDistanceTravelled()
+getName()
+hasFallen()
+getSymbol()
+
+The following mutator methods enable the confidence and symbol fields to be set from outside the class by making them public as well:
+setConfidence()
+setSymbol()
