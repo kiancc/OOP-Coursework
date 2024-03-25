@@ -1,0 +1,47 @@
+Problems identified:
+
+1. The first issue encountered was when initiliasing a new race in the main method of my TestRace program. An exception was thrown
+due to none of the horses being initialised or placed in lanes. To solve this, I created a new method setHorses(), which asks the 
+user to enter information of each horse, then initialises the horses and adds them to their lanes.
+
+2. The second problem I noticed is that races are limited to three horses. Should projects requirements change, and more horses need to be added,
+it would make sense to hold the horses in an array, and allocate space depending on how many horses are to be entered into the race. 
+To solve this, I implemented a method getNumHorses, which requests the user to input the number of horses participating in the race. 
+I removed the initialisation of the laneHorse variables in the constructor, as these are no longer needed. 
+
+I removed the three Horse fields and replaced it with an array of type Horse, called horses. This holds each horse registered to the race,
+with the index+1 of each element representing the lane the horse is in.
+
+I edited addHorse to add the horse to the corresponding index, or 'lane', in the horses array in order to accomodate a race with any
+number of horses.  
+
+3. Another problem I noticed is that when the horses fall, the symbols don't update. Furthermore, if all horses fall, the race keeps going.
+To solve this, I added code to the moveHorse method, which changes the symbol of the horse if it has fallen. I also changed the return type,
+in order to update the horse's status. I added a class field numFallen, in order to track the number of horses fallen. Each time a horse falls,
+the moveHorse method increments this by 1. I added a private hasAllFallen() method which returns true if all the horses in the race have fallen,
+and prints a message indicating such. I then added this to the condition of the while loop in startRace, so the loop stops iterating if 
+all the horses have fallen.
+
+4. Another problem identified 
+
+5. Another issue found is that the horse's information is not displayed on the terminal. To fix this I did...
+
+6. Identified an issue where a horse can reach the finish line but also fall on the same move. To fix this I put return statement in each
+if statement, so the method stops executing if the block is executd.
+
+Areas for improvement:
+I noticed areas for improvement, such as implementing abstraction by creating a checkWinner and moveHorses method in the startRace method.
+
+
+
+Changes made:
+    Added code to raceWonBy method that prints a winning message containing the horse that won.
+
+Created a method that resets all     the horses, as opposed to it being performed from the startRace method. 
+
+Edited startRace method to work with an array of horses. Did so by adding moveHorses method, which moves each horse in the array,
+and a checkWinner method, which iterates through the array and checks who the winner is. These changes help with abstractions as well.
+
+Edited printRace so it loops through the array of horses and calls printLane on each horse
+
+Added a line of code to print horses information in the printLine method
