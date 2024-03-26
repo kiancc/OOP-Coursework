@@ -13,7 +13,6 @@ public class Horse
     private int distanceTravelled;
     private boolean fallen;
     private double confidence;
-    
       
     //Constructor of class Horse
     /**

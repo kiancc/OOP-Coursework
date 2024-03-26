@@ -2,9 +2,53 @@ public class TestHorse {
     public static void main(String args[]) {
         //testClassVariableAccess();
         //testGetter();
-        testSetter();
+        //testSetter();
         //testFall();
         //testConstructor();
+        //testMoveForward();
+        testGoBackToStart();
+    }
+
+    public static void testGoBackToStart() {
+        Horse horse = new Horse('K', "Roly Poly", 0.7);
+        System.out.println("-----------------------------------------------------------------");
+        System.out.println("Testing goBackToStart()...");
+        System.out.println("Calling horse.fall()");
+        horse.fall();
+        System.out.println("Calling horse.moveForward()");
+        horse.moveForward();
+        System.out.println("Calling horse.moveForward()");
+        horse.moveForward();
+        System.out.println("Distance travelled: " + horse.getDistanceTravelled() + ", fallen: " + horse.hasFallen());
+        System.out.println("Calling goBackToStart...");
+        horse.goBackToStart();
+        if (horse.getDistanceTravelled() == 0 && horse.hasFallen() == false) {
+            System.out.println("Distance travelled: " + horse.getDistanceTravelled() + ", fallen: " + horse.hasFallen());
+            System.out.println("goBackToStart() Successful!");
+        } else {
+            System.out.println("goBackToStart() unsuccessful.");
+        }
+        System.out.println("-----------------------------------------------------------------");
+    }
+
+    public static void testMoveForward() {
+        Horse horse = new Horse('K', "Roly Poly", 0.7);
+        System.out.println("-----------------------------------------------------------------");
+        System.out.println("Testing moveForward...");
+        System.out.println("Current distance travelled: " + horse.getDistanceTravelled());
+        System.out.println("Calling horse.moveForward()");
+        horse.moveForward();
+        System.out.println("Calling horse.moveForward()");
+        horse.moveForward();
+        System.out.println("Calling horse.moveForward()");
+        horse.moveForward();
+        if (horse.getDistanceTravelled() == 3) {
+            System.out.println("New distance travelled: " + horse.getDistanceTravelled());
+            System.out.println("moveForward() Successful!");
+        } else {
+            System.out.println("moveForward() unsuccessful.");
+        }
+        System.out.println("-----------------------------------------------------------------");
     }
 
     // tests if the setter methods are correctly working
