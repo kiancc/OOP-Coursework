@@ -12,8 +12,7 @@ import java.util.*;
 public class Race
 {
     private int raceLength;
-    // 10/03/2024 removed Horse variables and replaced with an array of horses
-    private Horse[] horses;
+    private Horse[] horses;sun.awt.image
     private int numFallen;
 
     /**
@@ -55,22 +54,22 @@ public class Race
 
     /**
      * ADDED 10/03/2024
-     * Gets input from user on number of horses to add to race, and their info
+     * Gets input from user on number of lanes for the race
      * 
      * 
      * @param theHorse the horse to be added to the race
      * @param laneNumber the lane that the horse will be added to
      */
-    public void setHorses(int numHorses)
+    public void setLanes(int laneNumber)
     {
         //int numHorses = Integer.parseInt(inputString("How many horses are racing?"));
 
-        if (numHorses < 1) {
+        if (laneNumber < 1) {
             System.out.println("There cannot be 0 horses.");
-            setHorses(numHorses);
+            setLanes(laneNumber);
         }
         
-        horses = new Horse[numHorses];
+        horses = new Horse[laneNumber];
         /*
         for (int i = 0; i < numHorses; i++) {
             char symbol = inputString("Enter Symbol: ").charAt(0);

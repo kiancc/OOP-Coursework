@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Write a description of class Horse here.
@@ -93,5 +96,35 @@ public class Horse
     public void setSymbol(char newSymbol)
     {
         this.symbol = newSymbol;
+    }
+
+    /**
+     * IO methods
+     */
+
+     // reads in saved Horse
+    public Horse loadHorse() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("levelSave.txt"))) {
+            String line;
+            String name = "";
+            char symbol = '\0';
+            double confidence = 0;
+            int i = 0;
+            while ((line = reader.readLine()) != null) {
+                if (i == 0) {
+                    symbol = line.charAt(0);
+                }
+                if (i == 1) {
+                    name = line;
+                }
+                if (i == 2) {
+                    confidence = Double.parseDouble(line);
+                }
+            }
+            return new Horse(symbol, name, confidence);
+        } catch (IOException e) {
+            System.err.println("File does not exist, initialising new level: " + e.getMessage());
+        }
+        return null;
     }
 }
