@@ -22,10 +22,12 @@ public class Race
      * 
      * @param distance the length of the racetrack (in metres/yards...)
      */
-    public Race(int distance)
+    public Race(int distance, int numLanes)
     {
         // initialise instance variables
-        raceLength = distance;
+        this.raceLength = distance;
+        this.numLanes = numLanes;
+        this.horses = new Horse[numLanes];
     }
     
     /**
@@ -127,7 +129,9 @@ public class Race
      */
     private void moveHorses() {
         for (Horse h : horses) {
-            moveHorse(h);
+            if (h != null) {
+                moveHorse(h);
+            }
         }
     }
 
@@ -157,7 +161,9 @@ public class Race
     private void resetLanes() {
         this.numFallen = 0;
         for (Horse h : horses) {
-            h.goBackToStart();
+            if (h != null) {
+                h.goBackToStart();
+            }
         }
     }
     
@@ -206,7 +212,7 @@ public class Race
      */
     private boolean raceWonBy(Horse theHorse)
     {
-        if (theHorse.getDistanceTravelled() == raceLength)
+        if (theHorse != null && theHorse.getDistanceTravelled() == raceLength)
         {
             // 10/03/2024 added winning message with horses name
             theHorse = adjustConfidence(theHorse, 0.01);
@@ -232,7 +238,13 @@ public class Race
 
         // ADDED 10/03/2024 iterates through horses and prints the lane
         for (Horse horse : horses) {
-            printLane(horse);
+            if (horse != null) {
+                printLane(horse);
+                        // ADDED 10/03/2024 prints the horses information
+                System.out.print(" " + horse.getName() + " (Current confidence " + horse.getConfidence() + ")");
+            } else {
+                printEmptyLane();
+            }
             System.out.println();
         }
         
@@ -287,8 +299,24 @@ public class Race
         //print the | for the end of the track
         System.out.print('|');
 
-        // ADDED 10/03/2024 prints the horses information
-        System.out.print(" " + theHorse.getName() + " (Current confidence " + theHorse.getConfidence() + ")");
+    }
+
+        /*** 
+     * ADDED 31/03/2024 
+     * prints an empty lane
+     * 
+     */
+    private void printEmptyLane()
+    {
+        //print a | for the beginning of the lane
+        System.out.print('|');
+        
+        //print the spaces of the race length
+        multiplePrint(' ', raceLength + 1);
+        
+        //print the | for the end of the track
+        System.out.print('|');
+
     }
 
     /**
