@@ -13,6 +13,7 @@ public class Horse
     private int distanceTravelled;
     private boolean fallen;
     private double confidence;
+    private HorseMetrics metrics;
       
     //Constructor of class Horse
     /**
@@ -25,6 +26,7 @@ public class Horse
         this.confidence = horseConfidence;
         this.distanceTravelled = 0;
         this.fallen = false;
+        this.metrics = new HorseMetrics();
     }
     
     //Other methods of class Horse
