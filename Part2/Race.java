@@ -12,7 +12,8 @@ import java.util.*;
 public class Race
 {
     private int raceLength;
-    private Horse[] horses;sun.awt.image
+    private Horse[] horses;
+    private int numLanes;
     private int numFallen;
 
     /**
