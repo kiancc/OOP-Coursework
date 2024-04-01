@@ -55,35 +55,6 @@ public class Race
         }
     }
 
-    /**
-     * ADDED 10/03/2024
-     * Gets input from user on number of lanes for the race
-     * 
-     * 
-     * @param theHorse the horse to be added to the race
-     * @param laneNumber the lane that the horse will be added to
-     */
-    public void setLanes(int laneNumber)
-    {
-        //int numHorses = Integer.parseInt(inputString("How many horses are racing?"));
-
-        if (laneNumber < 1) {
-            System.out.println("There cannot be 0 horses.");
-            setLanes(laneNumber);
-        }
-        
-        horses = new Horse[laneNumber];
-        /*
-        for (int i = 0; i < numHorses; i++) {
-            char symbol = inputString("Enter Symbol: ").charAt(0);
-            String name = inputString("Enter Name: ");
-            double confidence = Double.parseDouble(inputString("Enter Confidence: "));
-            int lane = Integer.parseInt(inputString("Enter Lane: "));
-            Horse newHorse = new Horse(symbol, name, confidence);
-            addHorse(newHorse, lane);
-        }
-         */
-    }
     
     /**
      * Start the race
@@ -95,9 +66,6 @@ public class Race
     {
         //declare a local variable to tell us when the race is finished
         boolean finished = false;
-
-        // sets the horses to race
-        //setHorses();
         
         //reset all the lanes (all horses not fallen and back to 0). 
         resetLanes();
@@ -113,6 +81,8 @@ public class Race
             //if any of the horses has won the race is finished
             if ( checkWinner() )
             {
+                // tracks horse positions
+                trackPositionsAndUpdateHorseMetreics();
                 finished = true;
             }
            
@@ -131,6 +101,30 @@ public class Race
         for (Horse h : horses) {
             if (h != null) {
                 moveHorse(h);
+            }
+        }
+    }
+
+    /*
+     * Added 01/04/2024
+     * Tracks the positions of the horses and updates horse metrics
+     */
+    private void trackPositionsAndUpdateHorseMetreics() {
+        ArrayList<Integer> distances = new ArrayList<Integer>();
+        for (Horse h : horses) {
+            if (h != null) {
+                distances.add(h.getDistanceTravelled());
+            }
+        }
+
+        Collections.sort(distances, Collections.reverseOrder());
+
+        for (Horse h : horses) {
+            if (h != null) {
+                int position = distances.indexOf(h.getDistanceTravelled());
+                h.updateHMetrics(position+1, raceLength);
+                //System.out.println(h.getName() + " P" + (position + 1));
+                h.displayMetrics();
             }
         }
     }
@@ -154,6 +148,7 @@ public class Race
         }
         return false;
     }
+
 
     /**
      * Resets horses to beginning of race
@@ -216,6 +211,7 @@ public class Race
         {
             // 10/03/2024 added winning message with horses name
             theHorse = adjustConfidence(theHorse, 0.01);
+            theHorse.win();
             System.out.println("And the winner is " + theHorse.getName() + " Confidence: " + theHorse.getConfidence());
             return true;
         }

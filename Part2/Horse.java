@@ -66,9 +66,30 @@ public class Horse
         return symbol;
     }
 
+    // added 01/04/2024
+    public void displayMetrics() {
+        System.out.println("Races Won: " + metrics.getRacesWon());
+        System.out.println("Average Finishing Position: " + metrics.getAvgFinishPosition());
+        System.out.println("Position History: " + metrics.getPositionHistory());
+    }
+
     /**
      * mutator methods
      */
+
+    // Added 01/04/2024
+    // updates horse metrics 
+    public void updateHMetrics(int position, int raceLength) {
+        // note time does not work
+        double time = (double)distanceTravelled;
+        metrics.updateMetrics(distanceTravelled, time, fallen, position);
+    }
+
+    // Added 01/04/2024
+    // updates win metrics 
+    public void win() {
+        metrics.updateWin();
+    }
     
     public void goBackToStart()
     {
