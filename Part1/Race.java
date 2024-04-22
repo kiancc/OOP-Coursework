@@ -16,6 +16,7 @@ public class Race
     private int numLanes;
     private int numHorses;
     private int numFallen;
+    private String winner;
 
     /**
      * Constructor for objects of class Race
@@ -29,6 +30,7 @@ public class Race
         this.raceLength = distance;
         this.numLanes = numLanes;
         this.horses = new ArrayList<Horse>();
+        this.winner = "";
     }
     
     /**
@@ -70,7 +72,7 @@ public class Race
             // checks if all the horses have finished
             if (checkAllFinished())
             {
-                checkWinner();
+                raceWonBy();
                 finished = true;
             }
            
@@ -97,13 +99,19 @@ public class Race
      * Checks if all the horses have finished
      */
 
-    private boolean checkAllFinished() {
+     private boolean checkAllFinished() {
         int numFinished = 0;
+        String tempWinner = "";
         for (Horse horse : horses) {
             if (horse.getDistanceTravelled() == raceLength) {
                 numFinished++;
+                tempWinner = horse.getName();
             }
         }
+        if (numFinished == 1 && winner.equals("")) {
+            winner = tempWinner;
+        }
+
         if (numFinished == numHorses - numFallen) {
             return true;
         }
@@ -111,23 +119,17 @@ public class Race
     }
 
     /**
-     * Checks through the horses array to see if a horse has won
+     * Prints Information on whos won
      */
-    private boolean checkWinner() {
-        for (Horse h : horses) {
-            if (raceWonBy(h)) {
-                // if horse has max confidence then set it to 1, otherwise increase it
-                if (h.getConfidence() + 0.01 > 1) {
-                    h = adjustConfidence(h, 0);
-                }
-                else {
-                    h = adjustConfidence(h, 0.01);
-                }
-                
-                return true;
+    private void raceWonBy()
+    {
+        for (Horse horse : horses) {
+            if (horse.getName().equals(winner)) {
+                // added winning message with horses name
+                horse = adjustConfidence(horse, 0.01);
+                System.out.println("And the winner is " + horse.getName() + " Confidence: " + horse.getConfidence());
             }
         }
-        return false;
     }
 
 
@@ -136,6 +138,7 @@ public class Race
      */
     private void resetLanes() {
         this.numFallen = 0;
+        this.winner = "";
         for (Horse h : horses) {
             if (h != null) {
                 h.goBackToStart();
@@ -179,27 +182,7 @@ public class Race
 
         return;
     }
-        
-    /** 
-     * Determines if a horse has won the race
-     *
-     * @param theHorse The horse we are testing
-     * @return true if the horse has won, false otherwise.
-     */
-    private boolean raceWonBy(Horse theHorse)
-    {
-        if (theHorse != null && theHorse.getDistanceTravelled() == raceLength)
-        {
-            // added winning message with horses name
-            theHorse = adjustConfidence(theHorse, 0.01);
-            System.out.println("And the winner is " + theHorse.getName() + " Confidence: " + theHorse.getConfidence());
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    
     
     /***
      * Print the race on the terminal
@@ -213,11 +196,11 @@ public class Race
         System.out.println();
 
         // iterates through horses and prints the lane
-        for (Horse horse : horses) {
-            if (horse != null) {
-                printLane(horse);
-                // prints the horses information
-                System.out.print(" " + horse.getName() + " (Current confidence " + horse.getConfidence() + ")");
+        for (int i = 0; i < numLanes; i++) {
+            if (i < horses.size() && horses.get(i) != null) {
+                printLane(horses.get(i));
+                        // prints the horses information
+                System.out.print(" " + horses.get(i).getName() + " (Current confidence " + horses.get(i).getConfidence() + ")");
             } else {
                 printEmptyLane();
             }
