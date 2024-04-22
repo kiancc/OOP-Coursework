@@ -12,8 +12,9 @@ import java.util.*;
 public class Race
 {
     private int raceLength;
-    private Horse[] horses;
+    private ArrayList<Horse> horses;
     private int numLanes;
+    private int numHorses;
     private int numFallen;
 
     /**
@@ -27,7 +28,7 @@ public class Race
         // initialise instance variables
         this.raceLength = distance;
         this.numLanes = numLanes;
-        this.horses = new Horse[numLanes];
+        this.horses = new ArrayList<Horse>();
     }
     
     /**
@@ -35,24 +36,12 @@ public class Race
      * 10/03/2024 edited the method to 
      * 
      * @param theHorse the horse to be added to the race
-     * @param laneNumber the lane that the horse will be added to
+     * 
      */
-    public void addHorse(Horse theHorse, int laneNumber)
+    public void addHorse(Horse theHorse)
     {
-        // 10/03/2024 edited to add horse to the horses array 
-        if (laneNumber >= 1 && laneNumber <= horses.length && horses[laneNumber-1] == null)
-        {
-            horses[laneNumber-1] = theHorse;
-        }
-        else if (horses[laneNumber-1] != null) {
-            System.out.println("There is already a horse in that lane.");
-            int lane = Integer.parseInt(inputString("Enter lane: "));
-            addHorse(theHorse, lane);
-        }
-        else
-        {
-            System.out.println("Cannot add horse to lane " + laneNumber + " because there is no such lane");
-        }
+        this.horses.add(theHorse);
+        numHorses++;
     }
 
     
@@ -225,7 +214,7 @@ public class Race
      * checks if all the horses have fallen in the race
      */
     private boolean hasAllFallen() {
-        if (numFallen == horses.length) {
+        if (numFallen == numHorses) {
             System.out.println("All the horses have fallen.");
             return true;
         }
@@ -312,14 +301,4 @@ public class Race
         }
     }
 
-    /***
-     * ADDED 10/03/2024
-     * gets input from user
-     */
-    private String inputString(String message) {
-        System.out.println(message);
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        return input;
-    }
 }
