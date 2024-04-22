@@ -6,11 +6,11 @@ public class TestRace {
         Horse horse3 = new Horse('C', "CHARLIE", 0.6);
         Horse horse4 = new Horse('D', "DELTA", 0.75);
         Horse horse5 = new Horse('E', "ECHO", 0.7);
-        race.addHorse(horse1, 1);
-        race.addHorse(horse2, 2);
-        race.addHorse(horse3, 3);
-        race.addHorse(horse4, 4);
-        race.addHorse(horse5, 5);
+        race.addHorse(horse1);
+        race.addHorse(horse2);
+        race.addHorse(horse3);
+        race.addHorse(horse4);
+        race.addHorse(horse5);
         race.startRace();
     }
 

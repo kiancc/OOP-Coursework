@@ -67,9 +67,10 @@ public class Race
             //print the race positions
             printRace();
             
-            //if any of the horses has won the race is finished
-            if ( checkWinner() )
+            // checks if all the horses have finished
+            if (checkAllFinished())
             {
+                checkWinner();
                 finished = true;
             }
            
@@ -90,6 +91,23 @@ public class Race
                 moveHorse(h);
             }
         }
+    }
+
+    /*
+     * Checks if all the horses have finished
+     */
+
+    private boolean checkAllFinished() {
+        int numFinished = 0;
+        for (Horse horse : horses) {
+            if (horse.getDistanceTravelled() == raceLength) {
+                numFinished++;
+            }
+        }
+        if (numFinished == numHorses - numFallen) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -137,7 +155,7 @@ public class Race
         //if the horse has fallen it cannot move, 
         //so only run if it has not fallen
         
-        if  (!theHorse.hasFallen())
+        if  (!theHorse.hasFallen() && theHorse.getDistanceTravelled() != raceLength)
         {
             //the probability that the horse will move forward depends on the confidence;
             if (Math.random() < theHorse.getConfidence())
@@ -172,7 +190,7 @@ public class Race
     {
         if (theHorse != null && theHorse.getDistanceTravelled() == raceLength)
         {
-            // 10/03/2024 added winning message with horses name
+            // added winning message with horses name
             theHorse = adjustConfidence(theHorse, 0.01);
             System.out.println("And the winner is " + theHorse.getName() + " Confidence: " + theHorse.getConfidence());
             return true;
@@ -194,11 +212,11 @@ public class Race
         multiplePrint('=',raceLength+3); //top edge of track
         System.out.println();
 
-        // ADDED 10/03/2024 iterates through horses and prints the lane
+        // iterates through horses and prints the lane
         for (Horse horse : horses) {
             if (horse != null) {
                 printLane(horse);
-                        // ADDED 10/03/2024 prints the horses information
+                // prints the horses information
                 System.out.print(" " + horse.getName() + " (Current confidence " + horse.getConfidence() + ")");
             } else {
                 printEmptyLane();
