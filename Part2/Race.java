@@ -12,8 +12,8 @@ import java.util.*;
 public class Race
 {
     private int raceLength;
-    // 10/03/2024 removed Horse variables and replaced with an array of horses
     private Horse[] horses;
+    private int numLanes;
     private int numFallen;
 
     /**
@@ -22,10 +22,12 @@ public class Race
      * 
      * @param distance the length of the racetrack (in metres/yards...)
      */
-    public Race(int distance)
+    public Race(int distance, int numLanes)
     {
         // initialise instance variables
-        raceLength = distance;
+        this.raceLength = distance;
+        this.numLanes = numLanes;
+        this.horses = new Horse[numLanes];
     }
     
     /**
@@ -53,35 +55,6 @@ public class Race
         }
     }
 
-    /**
-     * ADDED 10/03/2024
-     * Gets input from user on number of horses to add to race, and their info
-     * 
-     * 
-     * @param theHorse the horse to be added to the race
-     * @param laneNumber the lane that the horse will be added to
-     */
-    public void setHorses(int numHorses)
-    {
-        //int numHorses = Integer.parseInt(inputString("How many horses are racing?"));
-
-        if (numHorses < 1) {
-            System.out.println("There cannot be 0 horses.");
-            setHorses(numHorses);
-        }
-        
-        horses = new Horse[numHorses];
-        /*
-        for (int i = 0; i < numHorses; i++) {
-            char symbol = inputString("Enter Symbol: ").charAt(0);
-            String name = inputString("Enter Name: ");
-            double confidence = Double.parseDouble(inputString("Enter Confidence: "));
-            int lane = Integer.parseInt(inputString("Enter Lane: "));
-            Horse newHorse = new Horse(symbol, name, confidence);
-            addHorse(newHorse, lane);
-        }
-         */
-    }
     
     /**
      * Start the race
@@ -93,9 +66,6 @@ public class Race
     {
         //declare a local variable to tell us when the race is finished
         boolean finished = false;
-
-        // sets the horses to race
-        //setHorses();
         
         //reset all the lanes (all horses not fallen and back to 0). 
         resetLanes();
@@ -127,7 +97,9 @@ public class Race
      */
     private void moveHorses() {
         for (Horse h : horses) {
-            moveHorse(h);
+            if (h != null) {
+                moveHorse(h);
+            }
         }
     }
 
@@ -151,13 +123,16 @@ public class Race
         return false;
     }
 
+
     /**
      * Resets horses to beginning of race
      */
     private void resetLanes() {
         this.numFallen = 0;
         for (Horse h : horses) {
-            h.goBackToStart();
+            if (h != null) {
+                h.goBackToStart();
+            }
         }
     }
     
@@ -206,7 +181,7 @@ public class Race
      */
     private boolean raceWonBy(Horse theHorse)
     {
-        if (theHorse.getDistanceTravelled() == raceLength)
+        if (theHorse != null && theHorse.getDistanceTravelled() == raceLength)
         {
             // 10/03/2024 added winning message with horses name
             theHorse = adjustConfidence(theHorse, 0.01);
@@ -232,7 +207,13 @@ public class Race
 
         // ADDED 10/03/2024 iterates through horses and prints the lane
         for (Horse horse : horses) {
-            printLane(horse);
+            if (horse != null) {
+                printLane(horse);
+                        // ADDED 10/03/2024 prints the horses information
+                System.out.print(" " + horse.getName() + " (Current confidence " + horse.getConfidence() + ")");
+            } else {
+                printEmptyLane();
+            }
             System.out.println();
         }
         
@@ -287,8 +268,24 @@ public class Race
         //print the | for the end of the track
         System.out.print('|');
 
-        // ADDED 10/03/2024 prints the horses information
-        System.out.print(" " + theHorse.getName() + " (Current confidence " + theHorse.getConfidence() + ")");
+    }
+
+        /*** 
+     * ADDED 31/03/2024 
+     * prints an empty lane
+     * 
+     */
+    private void printEmptyLane()
+    {
+        //print a | for the beginning of the lane
+        System.out.print('|');
+        
+        //print the spaces of the race length
+        multiplePrint(' ', raceLength + 1);
+        
+        //print the | for the end of the track
+        System.out.print('|');
+
     }
 
     /**
