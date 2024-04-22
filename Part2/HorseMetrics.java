@@ -1,8 +1,11 @@
-import java.util.*;
 
-public class HorseMetrics {
+import java.util.*;
+import java.io.Serializable;
+
+
+public class HorseMetrics implements Serializable  {
     private int totalDistance;
-    private int totalTime;
+    private double totalTime;
     private int numWon;
     private int numFalls;
     private int numRaces;
@@ -23,17 +26,21 @@ public class HorseMetrics {
     /*
      * updates horse metrics afer a race
      */
-    public void updateMetrics(int distance, int time, boolean won, boolean fall, int position) {
+    public void updateMetrics(int distance, double time, boolean fall, int position) {
         totalDistance += distance;
         totalTime += time;
-        if (won) {
-            numWon++;
-        }
         if (fall) {
             numFalls++;
         }
         positionHistory.push(position);
         numRaces++;
+    }
+
+    /*
+     * updates the number of wins if the horse wins
+     */
+    public void updateWin() {
+        numWon++;
     }
 
     // getter methods
@@ -48,7 +55,7 @@ public class HorseMetrics {
         /*
      * returns the total time
      */
-    public int getTotalTime() {
+    public double getTotalTime() {
         return this.totalTime;
     }
 

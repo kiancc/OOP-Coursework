@@ -20,25 +20,43 @@ public class Gui {
         JButton startRaceButton = new JButton("Start Race");
         JButton customizeTrackButton = new JButton("Customize Track");
         JButton customizeHorseButton = new JButton("Customize Horse");
+        JButton statisticsAndBettingButton = new JButton("Statistics and Betting");
+
+        ArrayList<Horse> horses = readInHorses();
 
         controlPanel.add(startRaceButton);
         controlPanel.add(customizeTrackButton);
         controlPanel.add(customizeHorseButton);
-
-        frame.add(trackPanel, BorderLayout.CENTER);
-        frame.add(controlPanel, BorderLayout.SOUTH);
-        frame.add(statisticsPanel, BorderLayout.EAST);
-
-        trackCustomisationPanel(frame, customizeTrackButton);
-        customiseHorse(frame);
-
-        ArrayList<Horse> horses = readInHorses();
+        controlPanel.add(statisticsAndBettingButton);
 
         startRaceButton.addActionListener(e -> {
             runRace(frame, horses);
         });
 
 
+        frame.add(trackPanel, BorderLayout.CENTER);
+        frame.add(controlPanel, BorderLayout.SOUTH);
+        frame.add(statisticsPanel, BorderLayout.EAST);        
+
+        
+        trackCustomisationPanel(frame, customizeTrackButton);
+        customiseHorse(frame, customizeHorseButton);
+        statisticsPanel(frame, statisticsAndBettingButton);
+
+        /*
+
+        statisticsAndBettingButton.addActionListener(e -> {
+            statisticsPanel(frame, statisticsAndBettingButton);
+        });
+
+        customizeTrackButton.addActionListener(e -> {
+            trackCustomisationPanel(frame, customizeTrackButton);
+        });
+
+        customizeHorseButton.addActionListener(e -> {
+            customiseHorse(frame, customizeHorseButton);
+        });
+*/
         frame.setVisible(true);
 /*
         JTextField display = new JTextField();
@@ -49,14 +67,20 @@ public class Gui {
     }
 
     public static void runRace(JFrame frame, ArrayList<Horse> horses) {
+
+        // Create the frame and make it visible
+        HorseRacingDemo demo = new HorseRacingDemo(horses);
+        demo.setVisible(true);
+        /*
         Race race = new Race(20, 8);
         int lane = 1;
         for (Horse horse : horses) {
             race.addHorse(horse, lane);
             lane++;
         }
-        race.startRace();
+        race.startRace();*/
     }
+    
 
     public static ArrayList<Horse> readInHorses() throws IOException {
         try {
@@ -109,9 +133,10 @@ public class Gui {
     }
 
     // method for displaying statistics and betting
-    public static void statisticsPanel(JFrame frame) {
+    public static void statisticsPanel(JFrame frame, JButton button) {
         JPanel statsPanel = new JPanel();
         statsPanel.setBorder(BorderFactory.createTitledBorder("Statistics & Analytics"));
+        
 
         // Add components to display statistics
         JLabel horseStatsLabel = new JLabel("Horse Performance:");
@@ -132,10 +157,21 @@ public class Gui {
         statsPanel.add(trackRecordsLabel);
         statsPanel.add(trackRecordsArea);
         statsPanel.add(bettingOddsLabel);
+        statsPanel.add(bettingOddsArea);
+
+        statsPanel.setVisible(false);
+
+        button.addActionListener(e -> {
+            // Toggle the visibility of the stats panel
+            statsPanel.setVisible(!statsPanel.isVisible());
+        });
+
+        // Add customizeTrackPanel to the main frame
+        frame.add(statsPanel, BorderLayout.CENTER);
     }
 
     // method for customising your horse
-    public static void customiseHorse(JFrame frame) {
+    public static void customiseHorse(JFrame frame, JButton button) {
         JPanel customizeHorsePanel = new JPanel();
         customizeHorsePanel.setBorder(BorderFactory.createTitledBorder("Customize Horse"));
 
@@ -153,8 +189,15 @@ public class Gui {
         customizeHorsePanel.add(coatColorLabel);
         customizeHorsePanel.add(colorComboBox);
 
-        // Add customizeHorsePanel to the main frame
-        frame.add(customizeHorsePanel, BorderLayout.EAST);
+        customizeHorsePanel.setVisible(false);
+
+        button.addActionListener(e -> {
+        // Toggle the visibility of the stats panel
+            customizeHorsePanel.setVisible(!customizeHorsePanel.isVisible());
+        });
+
+        // Add customizeTrackPanel to the main frame
+        frame.add(customizeHorsePanel, BorderLayout.CENTER);
     }
 
     // method for customising tracks
@@ -178,9 +221,6 @@ public class Gui {
         customizeTrackPanel.add(trackLengthLabel);
         customizeTrackPanel.add(trackLengthSlider);
 
-        // Add customizeTrackPanel to the main frame
-        frame.add(customizeTrackPanel, BorderLayout.CENTER);
-
         numTracksSpinner.addChangeListener(e -> {
         int numTracks = (int) numTracksSpinner.getValue();
             // Update the number of tracks in the game
@@ -199,6 +239,9 @@ public class Gui {
             // Toggle the visibility of the stats panel
             customizeTrackPanel.setVisible(!customizeTrackPanel.isVisible());
         });
+
+        // Add customizeTrackPanel to the main frame
+        frame.add(customizeTrackPanel, BorderLayout.CENTER);
 
     }
 }

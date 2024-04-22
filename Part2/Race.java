@@ -1,6 +1,7 @@
 import java.util.concurrent.TimeUnit;
 import java.lang.Math;
 import java.util.*;
+import java.io.*;
 
 /**
  * A three-horse race, each horse running in its own lane
@@ -62,7 +63,7 @@ public class Race
      * then repeatedly moved forward until the 
      * race is finished
      */
-    public void startRace()
+    public void startRace() throws IOException
     {
         //declare a local variable to tell us when the race is finished
         boolean finished = false;
@@ -81,14 +82,20 @@ public class Race
             //if any of the horses has won the race is finished
             if ( checkWinner() )
             {
+                // tracks horse positions
+                trackPositionsAndUpdateHorseMetrics();
                 finished = true;
             }
            
             //wait for 100 milliseconds
             try{ 
                 TimeUnit.MILLISECONDS.sleep(100);
-            }catch(Exception e){}
+            }catch(Exception e){
+
+            }
         }
+
+        save();
     }
 
     /**
@@ -103,6 +110,28 @@ public class Race
         }
     }
 
+    /*
+     * Added 01/04/2024
+     * Tracks the positions of the horses and updates horse metrics
+     */
+    private void trackPositionsAndUpdateHorseMetrics(){
+        ArrayList<Integer> distances = new ArrayList<Integer>();
+        for (Horse h : horses) {
+            if (h != null) {
+                distances.add(h.getDistanceTravelled());
+            }
+        }
+
+        Collections.sort(distances, Collections.reverseOrder());
+
+        for (Horse h : horses) {
+            if (h != null) {
+                int position = distances.indexOf(h.getDistanceTravelled());
+                h.updateHMetrics(position+1, raceLength);
+            }
+        }
+    }
+
     /**
      * Checks through the horses array to see if a horse has won
      */
@@ -112,6 +141,7 @@ public class Race
                 // if horse has max confidence then set it to 1, otherwise increase it
                 if (h.getConfidence() + 0.01 > 1) {
                     h = adjustConfidence(h, 0);
+                    h.win();
                 }
                 else {
                     h = adjustConfidence(h, 0.01);
@@ -185,6 +215,7 @@ public class Race
         {
             // 10/03/2024 added winning message with horses name
             theHorse = adjustConfidence(theHorse, 0.01);
+            theHorse.win();
             System.out.println("And the winner is " + theHorse.getName() + " Confidence: " + theHorse.getConfidence());
             return true;
         }
@@ -321,5 +352,53 @@ public class Race
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
         return input;
+    }
+
+    public void save() throws IOException {
+        try {
+            Map<String, Horse> horseInput = new HashMap<>();
+            /*
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("myObjects.dat"));
+            
+            // Read objects from the stream until the end is reached
+            Object obj = ois.readObject();
+            while (obj != null) {
+                // Process the object
+                if (obj instanceof Horse) {
+                    Horse instance = (Horse) obj;
+                    horseInput.put(instance.getName(), instance);
+                }
+                obj = ois.readObject();
+            }
+
+            ois.close();*/
+
+            for (Horse horse : horses) {
+                if (horse != null) {
+                    if (horseInput.containsKey(horse.getName())) {
+                        horseInput.replace(horse.getName(), horse);
+                    } else {
+                        horseInput.put(horse.getName(), horse);
+                    }
+                }
+
+            }
+
+            FileOutputStream f = new FileOutputStream(new File("myObjects.dat"));
+			ObjectOutputStream o = new ObjectOutputStream(f);
+
+            for (Map.Entry<String, Horse> entry : horseInput.entrySet()) {
+                Horse value = entry.getValue();
+                o.writeObject(value);
+            }
+
+			o.close();
+			f.close();
+
+
+        } catch (EOFException e) {
+            // Reached the end of the stream
+            System.out.println("End of stream reached.");
+        } 
     }
 }
