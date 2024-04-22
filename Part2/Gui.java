@@ -66,11 +66,43 @@ public class Gui {
         panel.add(display, BorderLayout.NORTH);*/
     }
 
+    public static ArrayList<Horse> readInHorses() throws IOException {
+        ArrayList<Horse> horses = new ArrayList<>();
+        String filePath = "myObjects.dat";
+        try {
+            FileInputStream fileIn = new FileInputStream(filePath);
+            ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+
+            // Read the object from the file
+            Horse horseObj = (Horse) objectIn.readObject();
+
+            while (horseObj != null) {
+                horses.add(horseObj);
+                horseObj = (Horse) objectIn.readObject();
+                System.out.println("Read object: " + horseObj);
+            }
+
+            // Close the ObjectInputStream and FileInputStream
+            objectIn.close();
+            fileIn.close();
+            } catch (EOFException e) {
+                    // This exception is thrown when the end of the file is reached
+                    System.out.println("End of file reached.");
+            } catch (ClassNotFoundException e) {
+                    // This exception is thrown if the class of the serialized object cannot be found
+                    e.printStackTrace();
+            } catch (IOException e) {
+                    // Handle IO exceptions
+                    e.printStackTrace();
+            }
+            return horses;
+        }
+
     public static void runRace(JFrame frame, ArrayList<Horse> horses) {
 
         // Create the frame and make it visible
-        HorseRacingDemo demo = new HorseRacingDemo(horses);
-        demo.setVisible(true);
+        //HorseRacingDemo demo = new HorseRacingDemo(horses);
+        //demo.setVisible(true);
         /*
         Race race = new Race(20, 8);
         int lane = 1;
@@ -80,25 +112,7 @@ public class Gui {
         }
         race.startRace();*/
     }
-    
 
-    public static ArrayList<Horse> readInHorses() throws IOException {
-        try {
-            BufferedReader bReader = new BufferedReader(new FileReader("horses.txt"));
-            String line = bReader.readLine();
-            ArrayList<Horse> horses = new ArrayList<>();
-            while (line != null) {
-                String[] data = line.split(",");
-                Horse horse = new Horse(data[0].charAt(0), data[1], Double.parseDouble(data[2]));
-                horses.add(horse);
-                line = bReader.readLine();
-            }
-            return horses;
-        } catch (IOException e) {
-            System.out.println("Cannot find file");
-            return null;
-        }
-    }
 
     public static void test(String[] args) {
         // Create the main frame
