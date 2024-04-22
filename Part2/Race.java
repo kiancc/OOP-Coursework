@@ -94,8 +94,8 @@ public class Race
 
             }
         }
-
-        save();
+        Map<String, Horse> horseInput = read();
+        save(horseInput);
     }
 
     /**
@@ -354,25 +354,41 @@ public class Race
         return input;
     }
 
-    public void save() throws IOException {
+    public Map<String, Horse> read() throws IOException {
+        Map<String, Horse> horseInput = new HashMap<>();
         try {
-            Map<String, Horse> horseInput = new HashMap<>();
-            /*
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("myObjects.dat"));
-            
-            // Read objects from the stream until the end is reached
-            Object obj = ois.readObject();
-            while (obj != null) {
-                // Process the object
-                if (obj instanceof Horse) {
-                    Horse instance = (Horse) obj;
-                    horseInput.put(instance.getName(), instance);
-                }
-                obj = ois.readObject();
+            String filePath = "myObjects.dat";
+            FileInputStream fileIn = new FileInputStream(filePath);
+            ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+
+            // Read the object from the file
+            Horse horseObj = (Horse) objectIn.readObject();
+
+            while (horseObj != null) {
+                horseInput.put(horseObj.getName(), horseObj);
+                horseObj = (Horse) objectIn.readObject();
+                System.out.println("Read object: " + horseObj.getName());
             }
 
-            ois.close();*/
+            // Close the ObjectInputStream and FileInputStream
+            objectIn.close();
+            fileIn.close();
 
+        } catch (EOFException e) {
+                // This exception is thrown when the end of the file is reached
+                System.out.println("End of file reached.");
+        } catch (ClassNotFoundException e) {
+                // This exception is thrown if the class of the serialized object cannot be found
+                e.printStackTrace();
+        } catch (IOException e) {
+                // Handle IO exceptions
+                e.printStackTrace();
+        }     
+        return horseInput;
+    }
+
+    public void save(Map<String, Horse> horseInput) throws IOException {
+        try {
             for (Horse horse : horses) {
                 if (horse != null) {
                     if (horseInput.containsKey(horse.getName())) {
@@ -387,8 +403,8 @@ public class Race
             FileOutputStream f = new FileOutputStream(new File("myObjects.dat"));
 			ObjectOutputStream o = new ObjectOutputStream(f);
 
-            for (Map.Entry<String, Horse> entry : horseInput.entrySet()) {
-                Horse value = entry.getValue();
+            for (Horse value : horseInput.values()) {
+                System.out.println("Written: " + value.getName());
                 o.writeObject(value);
             }
 
@@ -396,9 +412,9 @@ public class Race
 			f.close();
 
 
-        } catch (EOFException e) {
-            // Reached the end of the stream
-            System.out.println("End of stream reached.");
-        } 
+        } catch (IOException e) {
+                // Handle IO exceptions
+                e.printStackTrace();
+        }
     }
 }
