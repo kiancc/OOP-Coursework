@@ -4,22 +4,22 @@ import java.util.*;
 public class TestRace {
     public static void main(String[] args) throws IOException  {
         Race race = new Race(20, 20);
-        /*
+        
         Horse horse3 = new Horse('C', "BETTY", 0.6, null);
-        Horse horse4 = new Horse('D', "FATASS", 0.75, null);
-        Horse horse5 = new Horse('E', "RETARD", 0.7, null);
+        Horse horse4 = new Horse('D', "NIGEL", 0.75, null);
+        Horse horse5 = new Horse('E', "PILLOW", 0.7, null);
         race.addHorse(horse3, 1);
         race.addHorse(horse4, 2);
         race.addHorse(horse5, 3);
-        race.startRace();*/
-        
+        race.startRace();
+        /*
         ArrayList<Horse> horses = readInHorses();
         int i = 1;
         for (Horse horse : horses) {
             race.addHorse(horse, i);
             i++;
         }
-        race.startRace();
+        race.startRace(); */
     }
 
     // tests winner

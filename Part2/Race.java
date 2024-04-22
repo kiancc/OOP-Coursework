@@ -381,8 +381,8 @@ public class Race
                 // This exception is thrown if the class of the serialized object cannot be found
                 e.printStackTrace();
         } catch (IOException e) {
-                // Handle IO exceptions
-                e.printStackTrace();
+                System.out.println("No file found. New myObject.dat created.");
+                return horseInput;
         }     
         return horseInput;
     }
