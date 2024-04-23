@@ -437,7 +437,6 @@ public class RacePanel extends JPanel
                 e.printStackTrace();
         }
     }
-
     
     // set race GUI
     public void setRaceGUI(RaceGUI raceGUI) {
