@@ -22,6 +22,16 @@ public class Horse implements Serializable
     /**
      * Constructor for objects of class Horse
      */
+    public Horse(char horseSymbol, String horseName, double horseConfidence)
+    {
+        this.symbol = horseSymbol;
+        this.name = horseName;
+        this.confidence = horseConfidence;
+        this.distanceTravelled = 0;
+        this.fallen = false;
+        this.horseMetrics = new HorseMetrics();
+    }
+
     public Horse(char horseSymbol, String horseName, double horseConfidence, HorseMetrics horseMetrics)
     {
         this.symbol = horseSymbol;

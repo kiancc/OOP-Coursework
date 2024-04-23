@@ -29,19 +29,16 @@ public class Gui {
         controlPanel.add(customizeHorseButton);
         controlPanel.add(statisticsAndBettingButton);
 
-        startRaceButton.addActionListener(e -> {
-            runRace(frame, horses);
-        });
-
+        runRace(frame, horses);
 
         frame.add(trackPanel, BorderLayout.CENTER);
         frame.add(controlPanel, BorderLayout.SOUTH);
         frame.add(statisticsPanel, BorderLayout.EAST);        
 
         
-        trackCustomisationPanel(frame, customizeTrackButton);
-        customiseHorse(frame, customizeHorseButton);
-        statisticsPanel(frame, statisticsAndBettingButton);
+        //trackCustomisationPanel(frame, customizeTrackButton);
+        //customiseHorse(frame, customizeHorseButton);
+        //statisticsPanel(frame, statisticsAndBettingButton);
 
         /*
 
@@ -98,19 +95,40 @@ public class Gui {
             return horses;
         }
 
-    public static void runRace(JFrame frame, ArrayList<Horse> horses) {
+    public static void runRace(JFrame frame, ArrayList<Horse> horses) throws IOException {
+        try {
+            GuiRacePanel race = new GuiRacePanel(100, 5);
+            Horse horse3 = new Horse('C', "BETTY", 0.6, null);
+            Horse horse4 = new Horse('D', "NIGEL", 0.75, null);
+            Horse horse5 = new Horse('E', "PILLOW", 0.7, null);
+            race.addHorse(horse3);
+            race.addHorse(horse4);
+            race.addHorse(horse5);
 
-        // Create the frame and make it visible
-        //HorseRacingDemo demo = new HorseRacingDemo(horses);
-        //demo.setVisible(true);
-        /*
-        Race race = new Race(20, 8);
-        int lane = 1;
-        for (Horse horse : horses) {
-            race.addHorse(horse, lane);
-            lane++;
+            race.startRace();
+
+            JLabel win = new JLabel(race.getWinner(), SwingConstants.CENTER);
+            //frame.add(win);
+            //trackPanel.add(race);
+
+            // Add the panel to the frame
+            frame.add(race);
+            //frame.add(trackPanel, BorderLayout.CENTER);
+
+            // Create the frame and make it visible
+            //HorseRacingDemo demo = new HorseRacingDemo(horses);
+            //demo.setVisible(true);
+            /*
+            Race race = new Race(20, 8);
+            int lane = 1;
+            for (Horse horse : horses) {
+                race.addHorse(horse, lane);
+                lane++;
+            }
+            race.startRace();*/
+        } catch (IOException e) {
+            System.out.println("Something went wrong.");
         }
-        race.startRace();*/
     }
 
 
@@ -219,13 +237,13 @@ public class Gui {
         JPanel customizeTrackPanel = new JPanel();
         customizeTrackPanel.setBorder(BorderFactory.createTitledBorder("Customize Track"));
 
-        // Add components for customizing the number of tracks
+        // Customise the number of tracks
         JLabel numTracksLabel = new JLabel("Number of Tracks:");
         JSpinner numTracksSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         customizeTrackPanel.add(numTracksLabel);
         customizeTrackPanel.add(numTracksSpinner);
 
-        // Add components for customizing track length
+        // Customise track length
         JLabel trackLengthLabel = new JLabel("Track Length:");
         JSlider trackLengthSlider = new JSlider(JSlider.HORIZONTAL, 10, 100, 50);
         trackLengthSlider.setMajorTickSpacing(40);

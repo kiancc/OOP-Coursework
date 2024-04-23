@@ -1,7 +1,13 @@
+import javax.swing.*;
+import javax.swing.Timer;
 import java.util.concurrent.TimeUnit;
 import java.lang.Math;
 import java.util.*;
 import java.io.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A three-horse race, each horse running in its own lane
@@ -10,7 +16,7 @@ import java.io.*;
  * @author McFarewell
  * @version 1.0
  */
-public class Race
+public class GuiRacePanel extends JPanel
 {
     private int raceLength;
     private ArrayList<Horse> horses;
@@ -18,6 +24,7 @@ public class Race
     private int numHorses;
     private int numFallen;
     private String winner;
+    private Timer timer;
 
     /**
      * Constructor for objects of class Race
@@ -25,7 +32,7 @@ public class Race
      * 
      * @param distance the length of the racetrack (in metres/yards...)
      */
-    public Race(int distance, int numLanes)
+    public GuiRacePanel(int distance, int numLanes)
     {
         // initialise instance variables
         this.raceLength = distance;
@@ -62,31 +69,34 @@ public class Race
         //reset all the lanes (all horses not fallen and back to 0). 
         resetLanes();
                       
-        while (!finished && !hasAllFallen())
-        {
-            //move horses
-            moveHorses();
-                        
-            //print the race positions
-            printRace();
-            
-            //if any of the horses has won the race is finished
-            if ( checkAllFinished() )
-            {
-                raceWonBy();
-                trackPositionsAndUpdateHorseMetrics();
-                finished = true;
-            }
-           
-            //wait for 100 milliseconds
-            try{ 
-                TimeUnit.MILLISECONDS.sleep(100);
-            }catch(Exception e){
+        // Create a Timer with a delay of 100 ms
+        timer = new Timer(100, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Move horses
+                moveHorses();
 
+                // Print the race positions
+                //printRace();
+
+                // If any of the horses has won, the race is finished
+                if (checkAllFinished()) {
+                    raceWonBy();
+                    trackPositionsAndUpdateHorseMetrics();
+                    // Stop the timer when the race is finished
+                    ((Timer) e.getSource()).stop();
+                } else if (hasAllFallen()) {
+                    // Stop the timer if all horses have fallen
+                    ((Timer) e.getSource()).stop();
+                }
+                repaint();
             }
-        }
-        Map<String, Horse> horseInput = read();
-        save(horseInput);
+        });
+
+        timer.start();
+
+        //Map<String, Horse> horseInput = read();
+        //save(horseInput);
     }
 
     /**
@@ -177,6 +187,11 @@ public class Race
             if (Math.random() < theHorse.getConfidence())
             {
                theHorse.moveForward();
+               theHorse.moveForward();
+               theHorse.moveForward();
+               theHorse.moveForward();
+               theHorse.moveForward();
+
                return;
             }
             //the probability that the horse will fall is very small (max is 0.1)
@@ -218,28 +233,36 @@ public class Race
      * Print the race on the terminal
      * 10/03/2024 edited to loop through horses and print lane
      */
-    private void printRace()
-    {
-        System.out.print('\u000C');  //clear the terminal window
-        
-        multiplePrint('=',raceLength+3); //top edge of track
-        System.out.println();
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-        // iterates through horses and prints the lane
+        int yPos = 200;
+        int xPos = 350;
+
+        // Cast Graphics to Graphics2D
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Set the color for the string
+        g2d.setColor(Color.BLACK);
+        g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+
+        // Define the string to draw
+        String text = "Hello, world!";
+
         for (int i = 0; i < numLanes; i++) {
             if (i < horses.size() && horses.get(i) != null) {
-                printLane(horses.get(i));
-                        // prints the horses information
-                System.out.print(" " + horses.get(i).getName() + " (Current confidence " + horses.get(i).getConfidence() + ")");
+                //g2d.drawString(horses.get(i).getSymbol() + "", horses.get(i).getDistanceTravelled(), yPos);
+                printLane(horses.get(i), g2d, xPos, yPos);
+                //System.out.print(" " + horses.get(i).getName() + " (Current confidence " + horses.get(i).getConfidence() + ")");
             } else {
-                printEmptyLane();
+                printEmptyLane(g2d, xPos, yPos);
             }
-            System.out.println();
+            yPos += 30;
         }
-        
-        multiplePrint('=',raceLength+3); //bottom edge of track
-        System.out.println();    
     }
+
 
     /**
      * checks if all the horses have fallen in the race
@@ -258,35 +281,21 @@ public class Race
      * |           X                      |
      * to show how far the horse has run
      */
-    private void printLane(Horse theHorse)
+    private void printLane(Horse horse, Graphics2D g2d, int xPos, int yPos)
     {
-        //calculate how many spaces are needed before
-        //and after the horse
-        int spacesBefore = theHorse.getDistanceTravelled();
-        int spacesAfter = raceLength - theHorse.getDistanceTravelled();
-        
-        //print a | for the beginning of the lane
-        System.out.print('|');
-        
-        //print the spaces before the horse
-        multiplePrint(' ',spacesBefore);
+
+        g2d.drawLine(xPos, yPos+ 10, raceLength + xPos, yPos + 10);
         
         //if the horse has fallen then print dead
         //else print the horse's symbol
-        if(theHorse.hasFallen())
+        if(horse.hasFallen())
         {
-            System.out.print('\u2322');
+            g2d.drawString('\u2322' + "", horse.getDistanceTravelled() + xPos, yPos);
         }
         else
         {
-            System.out.print(theHorse.getSymbol());
+            g2d.drawString(horse.getSymbol() + "", horse.getDistanceTravelled() + xPos, yPos);
         }
-        
-        //print the spaces after the horse
-        multiplePrint(' ',spacesAfter);
-        
-        //print the | for the end of the track
-        System.out.print('|');
 
     }
 
@@ -295,17 +304,10 @@ public class Race
      * prints an empty lane
      * 
      */
-    private void printEmptyLane()
+    private void printEmptyLane(Graphics2D g2d, int xPos, int yPos)
     {
-        //print a | for the beginning of the lane
-        System.out.print('|');
-        
-        //print the spaces of the race length
-        multiplePrint(' ', raceLength + 1);
-        
-        //print the | for the end of the track
-        System.out.print('|');
-
+        g2d.drawLine(xPos, yPos+ 10, raceLength + xPos, yPos + 10);
+        g2d.drawString(" ", xPos, yPos);
     }
 
     /**
@@ -332,6 +334,14 @@ public class Race
         }
     }
 
+    public String getWinner() {
+        if (winner.equals("")) {
+            return "The winner is " + this.winner + "!";
+        } else {
+            return "No one won.";
+        }
+    }
+
     /***
      * ADDED 10/03/2024
      * gets input from user
@@ -342,7 +352,7 @@ public class Race
         String input = scanner.nextLine();
         return input;
     }
-
+    /*
     public Map<String, Horse> read() throws IOException {
         Map<String, Horse> horseInput = new HashMap<>();
         try {
@@ -405,5 +415,37 @@ public class Race
                 // Handle IO exceptions
                 e.printStackTrace();
         }
-    }
+    }*/
+    /*
+    public static void main(String[] args) throws IOException {
+        GuiRacePanel race = new GuiRacePanel(90, 5);
+        Horse horse3 = new Horse('C', "BETTY", 0.6, null);
+        Horse horse4 = new Horse('D', "NIGEL", 0.75, null);
+        Horse horse5 = new Horse('E', "PILLOW", 0.7, null);
+        race.addHorse(horse3);
+        race.addHorse(horse4);
+        race.addHorse(horse5);
+
+        // Create a JFrame
+        JFrame frame = new JFrame("Moving String Example");
+        JPanel trackPanel = new JPanel();
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        race.startRace();
+
+        JLabel win = new JLabel(race.getWinner(), SwingConstants.CENTER);
+        //frame.add(win);
+        trackPanel.add(race);
+
+        // Add the panel to the frame
+        frame.add(race);
+        //frame.add(trackPanel, BorderLayout.CENTER);
+
+        // Set the frame size
+        frame.setSize(800, 600);
+
+        // Make the frame visible
+        frame.setVisible(true);
+    }*/
 }

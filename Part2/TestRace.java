@@ -1,9 +1,17 @@
+
 import java.io.*;
 import java.util.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.Timer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 public class TestRace {
     public static void main(String[] args) throws IOException  {
-        Race race = new Race(20, 5);
+        GuiRacePanel race = new GuiRacePanel(20, 5);
         
         Horse horse3 = new Horse('C', "BETTY", 0.6, null);
         Horse horse4 = new Horse('D', "NIGEL", 0.75, null);
