@@ -28,6 +28,7 @@ public class RacePanel extends JPanel
     public boolean raceFinished;
     private RaceGUI raceGUI;
     private String trackColour;
+    private int numFinished;
 
     /**
      * Constructor for objects of class Race
@@ -91,7 +92,6 @@ public class RacePanel extends JPanel
                 // If any of the horses has won, the race is finished
                 if (checkAllFinished()) {
                     raceWonBy();
-                    trackPositionsAndUpdateHorseMetrics();
                     raceFinished = true;
                     // Stop the timer when the race is finished
                     raceGUI.updateRaceWinner("The race has finished. The winner is: " + getWinner());
@@ -127,19 +127,18 @@ public class RacePanel extends JPanel
      */
 
     private boolean checkAllFinished() {
-        int numFinished = 0;
-        String tempWinner = "";
         for (Horse horse : horses) {
-            if (horse.getDistanceTravelled() == raceLength) {
+            if (horse.getDistanceTravelled() == raceLength && horse.getFinished() == false) {
+                horse.setFinished();
+                horse = updateHorseMetrics(horse, numFinished+1);
                 numFinished++;
-                tempWinner = horse.getName();
+                if (numFinished - numFallen == 1) {
+                    this.winner = horse.getName();
+                }
             }
         }
-        if (numFinished == 1 && winner == null) {
-            winner = tempWinner;
-        }
 
-        if (numFinished == numHorses - numFallen) {
+        if (numFinished == numHorses) {
             return true;
         }
         return false;
@@ -149,28 +148,16 @@ public class RacePanel extends JPanel
      * Added 01/04/2024
      * Tracks the positions of the horses and updates horse metrics
      */
-    private void trackPositionsAndUpdateHorseMetrics(){
-        ArrayList<Integer> distances = new ArrayList<Integer>();
-        for (Horse h : horses) {
-            if (h != null) {
-                distances.add(h.getDistanceTravelled());
-            }
-        }
-
-        Collections.sort(distances, Collections.reverseOrder());
-
-        for (Horse h : horses) {
-            if (h != null) {
-                int position = distances.indexOf(h.getDistanceTravelled());
-                h.updateHMetrics(position+1, raceLength);
-            }
-        }
+    private Horse updateHorseMetrics(Horse horse, int position) {
+        horse.updateHMetrics(position, raceLength);
+        return horse;
     }
 
     /**
      * Resets horses to beginning of race
      */
     private void resetLanes() {
+        this.numFinished = 0;
         this.numFallen = 0;
         this.winner = null;
         for (Horse h : horses) {
@@ -202,7 +189,6 @@ public class RacePanel extends JPanel
                theHorse.moveForward();
                theHorse.moveForward();
                theHorse.moveForward();
-
                return;
             }
             //the probability that the horse will fall is very small (max is 0.1)
@@ -214,6 +200,7 @@ public class RacePanel extends JPanel
                 theHorse.fall();
                 // ADDED 10/03/2024 decreases horses confidence by an arbitrary amount
                 theHorse = adjustConfidence(theHorse, -0.01);
+                numFinished++;
                 numFallen++;
                 return;
             }
@@ -256,20 +243,28 @@ public class RacePanel extends JPanel
         // Cast Graphics to Graphics2D
         Graphics2D g2d = (Graphics2D) g;
         Graphics2D g2dHorse = (Graphics2D) g;
+        Graphics2D g2dFinishLine = (Graphics2D) g;
 
         // Set the color for the string
         g2d.setColor(Color.BLACK);
         g2d.setFont(new Font("Arial", Font.PLAIN, 20));
-        g2dHorse.setColor(Color.BLACK);
 
         // Define the string to draw
-        String text = "Hello, world!";
         g2d.drawLine(xPos, 180, xPos + raceLength, 180);
+        g2d.setColor(Color.RED);
+        g2d.drawLine(xPos + raceLength, 180, xPos + raceLength + 20, 180); // red finish boxes
+        g2d.setColor(Color.BLACK);
         for (int i = 0; i < numLanes; i++) {
-            g2d.drawLine(xPos, yPos+ 10, xPos  + raceLength, yPos + 10);
+            g2d.drawLine(xPos, yPos-20, xPos, yPos + 10); // draws back of box
+            g2d.drawLine(xPos + raceLength, yPos-20, xPos + raceLength, yPos + 10); // draws front of box
+            g2d.drawLine(xPos, yPos+ 10, xPos + raceLength, yPos + 10);
+            g2d.setColor(Color.RED);
+            g2d.drawLine(xPos + raceLength, yPos+ 10, xPos + raceLength + 20, yPos + 10); // red finish boxes
+            g2d.drawLine(xPos + raceLength + 20, yPos-20, xPos + raceLength + 20, yPos + 10); // draws back of finish box
+            g2d.setColor(Color.BLACK);
             if (i < horses.size() && horses.get(i) != null) {
                 //g2d.drawString(horses.get(i).getSymbol() + "", horses.get(i).getDistanceTravelled(), yPos);
-                printLane(horses.get(i), g2dHorse, xPos, yPos);
+                printLane(horses.get(i), g2d, xPos, yPos);
                 //System.out.print(" " + horses.get(i).getName() + " (Current confidence " + horses.get(i).getConfidence() + ")");
             } else {
                 printEmptyLane(g2d, xPos, yPos);

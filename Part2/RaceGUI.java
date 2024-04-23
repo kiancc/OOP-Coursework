@@ -10,14 +10,12 @@ import java.io.IOException;
 public class RaceGUI extends JFrame {
     private RacePanel racePanel; // The race panel
     private JLabel raceWinnerLabel;
+    private ArrayList<Horse> horses;
 
     // Constructor
     public RaceGUI() {
         // Set the title of the frame
         setTitle("Horse Race");
-
-        this.setBackground(Color.YELLOW);
-
         // Set the default close operation
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -28,6 +26,10 @@ public class RaceGUI extends JFrame {
         // Create a GuiRacePanel with the desired parameters
         racePanel = new RacePanel(100, 5); // Modify the parameters as needed
         racePanel.setRaceGUI(this);
+
+        JPanel trackPanel = new JPanel();
+        //frame.add(win);
+
         try {
             readInHorses(racePanel);
         } catch (IOException e) {
@@ -43,6 +45,7 @@ public class RaceGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Start the race when the button is clicked
                 try {
+                    raceWinnerLabel.setText("");
                     racePanel.startRace();
                 } catch (IOException ee) {
 
@@ -50,12 +53,10 @@ public class RaceGUI extends JFrame {
             }
         });
 
-        // Create a panel to hold the button
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(startButton);
 
-
-        // Create a customize track button
+        // Customize track button
         JButton customizeTrackButton = new JButton("Customize Track");
         customizeTrackButton.addActionListener(new ActionListener() {
             @Override
@@ -63,7 +64,19 @@ public class RaceGUI extends JFrame {
                 customiseTrack();
             }
         });
+
         buttonPanel.add(customizeTrackButton);
+        
+        // Betting System track button
+        JButton bettingStatisticsButton = new JButton("Betting & Statistics");
+        bettingStatisticsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                bettingStatistics();
+            }
+        });
+
+        buttonPanel.add(bettingStatisticsButton);
 
         // Add the race panel and button panel to the frame
         add(racePanel, BorderLayout.CENTER);
@@ -89,9 +102,9 @@ public class RaceGUI extends JFrame {
     /*
     * Read in horses and store in Race
     */
-    public static void  readInHorses(RacePanel racePanel) throws IOException {
-        ArrayList<Horse> horses = new ArrayList<>();
+    private void  readInHorses(RacePanel racePanel) throws IOException {
         String filePath = "horses.dat";
+        horses = new ArrayList<>();
         try {
             FileInputStream fileIn = new FileInputStream(filePath);
             ObjectInputStream objectIn = new ObjectInputStream(fileIn);
@@ -137,5 +150,20 @@ public class RaceGUI extends JFrame {
         customiseDialog.pack();
         customiseDialog.setLocationRelativeTo(this); // Center the dialog
         customiseDialog.setVisible(true);
+    }
+
+    // open Customisation
+    private void bettingStatistics() {
+        // Create the customization panel and wrap it in a dialog
+        BettingStatistics bettingStatistics = new BettingStatistics(this);
+        JDialog customiseDialog = new JDialog(this, "Betting & Statistics", true);
+        customiseDialog.add(bettingStatistics);
+        customiseDialog.pack();
+        customiseDialog.setLocationRelativeTo(this); // Center the dialog
+        customiseDialog.setVisible(true);
+    }
+
+    public ArrayList<Horse> getHorses() {
+        return this.horses;
     }
 }
