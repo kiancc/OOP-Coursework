@@ -107,7 +107,7 @@ public class Race
         int numFinished = 0;
         String tempWinner = "";
         for (Horse horse : horses) {
-            if (horse.getDistanceTravelled() == raceLength) {
+            if (horse != null && horse.getDistanceTravelled() == raceLength) {
                 numFinished++;
                 tempWinner = horse.getName();
             }
@@ -175,7 +175,6 @@ public class Race
             //so if you double the confidence, the probability that it will fall is *2
             if (Math.random() < (0.1*theHorse.getConfidence()*theHorse.getConfidence()))
             {
-                // ADDED 10/03/2024 ONE LINE BELOW: changes the symbol of the horse if it has fallen
                 theHorse.fall();
                 // ADDED 10/03/2024 decreases horses confidence by an arbitrary amount
                 theHorse = adjustConfidence(theHorse, -0.01);
@@ -250,6 +249,7 @@ public class Race
         if(theHorse.hasFallen())
         {
             System.out.print('\u2322');
+            //\u274C
         }
         else
         {

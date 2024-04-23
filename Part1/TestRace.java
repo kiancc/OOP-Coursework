@@ -1,6 +1,6 @@
 public class TestRace {
     public static void main(String[] args) {
-        Race race = new Race(20, 8);
+        Race race = new Race(10, 8);
         Horse horse1 = new Horse('A', "ALPHA", 0.8);
         Horse horse2 = new Horse('B', "BETA", 0.4);
         Horse horse3 = new Horse('C', "CHARLIE", 0.6);
