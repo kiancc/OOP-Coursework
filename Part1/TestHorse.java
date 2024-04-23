@@ -1,12 +1,46 @@
 public class TestHorse {
     public static void main(String args[]) {
         //testClassVariableAccess();
-        //testGetter();
+        testGetter();
         //testSetter();
         //testFall();
         //testConstructor();
         //testMoveForward();
-        testGoBackToStart();
+        //testGoBackToStart();
+    }
+
+    public static void testGetter() {
+        System.out.println("-----------------------------------------------------------------");
+        System.out.println("Creating new Horse with Symbol: K, Name: Roly Poly, Confidence: 0.7");
+        Horse horse = new Horse('K', "Roly Poly", 0.7);
+        System.out.println();
+
+        if (horse.getSymbol() == 'K') {
+            System.out.println("horse.getSymbol() == " + horse.getSymbol() + ", Expected value: K");
+            System.out.println("getSymbol() Successful!");
+        } else {
+            System.out.println("horse.getSymbol() == " + horse.getSymbol() + ", Expected value: K");
+            System.out.println("getSymbol() unsuccessful.");
+        }
+        System.out.println();
+
+        if (horse.getName().equals("Roly Poly")) {
+            System.out.println("horse.getName() == " + horse.getName() + ", Expected value: Roly Poly");
+            System.out.println("getName() Successful!");
+        } else {
+            System.out.println("horse.getName() == " + horse.getName() + ", Expected value: Roly Poly");
+            System.out.println("getName() unsuccessful.");
+        }
+        System.out.println();
+
+        if (horse.getConfidence() == 0.7) {
+            System.out.println("horse.getConfidence() == " + horse.getConfidence() + ", Expected value: 0.7");
+            System.out.println("getConfidence() Successful!");
+        } else {
+            System.out.println("horse.getConfidence() == " + horse.getConfidence() + ", Expected value: 0.7");
+            System.out.println("getConfidence() unsuccessful.");
+        }
+        System.out.println("-----------------------------------------------------------------");
     }
 
     public static void testGoBackToStart() {

@@ -42,8 +42,12 @@ public class Race
      */
     public void addHorse(Horse theHorse)
     {
-        this.horses.add(theHorse);
-        numHorses++;
+        if (numHorses == numLanes) {
+            System.out.println("The race is full! No more horses can be added.");
+        } else {
+            this.horses.add(theHorse);
+            numHorses++;
+        }
     }
 
     
