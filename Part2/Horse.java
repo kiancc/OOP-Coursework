@@ -17,6 +17,7 @@ public class Horse implements Serializable
     private boolean fallen;
     private double confidence;
     private HorseMetrics horseMetrics;
+    private boolean finished;
       
     //Constructor of class Horse
     /**
@@ -30,6 +31,7 @@ public class Horse implements Serializable
         this.distanceTravelled = 0;
         this.fallen = false;
         this.horseMetrics = new HorseMetrics();
+        this.finished = false;
     }
 
     public Horse(char horseSymbol, String horseName, double horseConfidence, HorseMetrics horseMetrics)
@@ -44,6 +46,7 @@ public class Horse implements Serializable
         } else {
             this.horseMetrics = horseMetrics;
         }
+        this.finished = false;
     }
     
     // updates horse metrics 
@@ -92,6 +95,14 @@ public class Horse implements Serializable
         return symbol;
     }
 
+    public HorseMetrics getHorseMetrics() {
+        return horseMetrics;
+    }
+
+    public boolean getFinished() {
+        return this.finished;
+    }
+
     /**
      * mutator methods
      */
@@ -100,6 +111,7 @@ public class Horse implements Serializable
     {
         this.distanceTravelled = 0;
         this.fallen = false;
+        this.finished = false;
     }
 
     public void moveForward()
@@ -122,6 +134,10 @@ public class Horse implements Serializable
     public void setSymbol(char newSymbol)
     {
         this.symbol = newSymbol;
+    }
+
+    public void setFinished() {
+        this.finished = true;
     }
     /*
     public void saveHorseInformation() throws IOException {
