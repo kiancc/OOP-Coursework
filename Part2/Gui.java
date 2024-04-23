@@ -82,18 +82,18 @@ public class Gui {
             // Close the ObjectInputStream and FileInputStream
             objectIn.close();
             fileIn.close();
-            } catch (EOFException e) {
-                    // This exception is thrown when the end of the file is reached
-                    System.out.println("End of file reached.");
-            } catch (ClassNotFoundException e) {
-                    // This exception is thrown if the class of the serialized object cannot be found
-                    e.printStackTrace();
-            } catch (IOException e) {
-                    // Handle IO exceptions
-                    e.printStackTrace();
-            }
-            return horses;
+        } catch (EOFException e) {
+                // This exception is thrown when the end of the file is reached
+                System.out.println("End of file reached.");
+        } catch (ClassNotFoundException e) {
+                // This exception is thrown if the class of the serialized object cannot be found
+                e.printStackTrace();
+        } catch (IOException e) {
+                // Handle IO exceptions
+                e.printStackTrace();
         }
+        return horses;
+    }
 
     public static void runRace(JFrame frame, ArrayList<Horse> horses) throws IOException {
         try {
