@@ -27,6 +27,7 @@ public class RacePanel extends JPanel
     private Timer timer;
     public boolean raceFinished;
     private RaceGUI raceGUI;
+    private String trackColour;
 
     /**
      * Constructor for objects of class Race
@@ -40,7 +41,7 @@ public class RacePanel extends JPanel
         this.raceLength = distance;
         this.numLanes = numLanes;
         this.horses = new ArrayList<Horse>();
-        this.winner = "";
+        this.winner = null;
     }
     
     /**
@@ -75,12 +76,18 @@ public class RacePanel extends JPanel
         timer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Move horses
-                moveHorses();
-
                 // Print the race positions
                 //printRace();
 
+                moveHorses();
+
+                if (hasAllFallen()) {
+                    raceFinished = true;
+                    // Stop the timer if all horses have fallen
+                    raceGUI.updateRaceWinner("All horses have fallen. There is no winner.");
+                    ((Timer) e.getSource()).stop();
+                    return;
+                } 
                 // If any of the horses has won, the race is finished
                 if (checkAllFinished()) {
                     raceWonBy();
@@ -89,12 +96,10 @@ public class RacePanel extends JPanel
                     // Stop the timer when the race is finished
                     raceGUI.updateRaceWinner("The race has finished. The winner is: " + getWinner());
                     ((Timer) e.getSource()).stop();
-                } else if (hasAllFallen()) {
-                    raceFinished = true;
-                    // Stop the timer if all horses have fallen
-                    raceGUI.updateRaceWinner("All horses have fallen. There is no winner.");
-                    ((Timer) e.getSource()).stop();
-                }
+                    return;
+                } 
+
+
                 repaint();
             }
         });
@@ -130,7 +135,7 @@ public class RacePanel extends JPanel
                 tempWinner = horse.getName();
             }
         }
-        if (numFinished == 1 && winner.equals("")) {
+        if (numFinished == 1 && winner == null) {
             winner = tempWinner;
         }
 
@@ -167,7 +172,7 @@ public class RacePanel extends JPanel
      */
     private void resetLanes() {
         this.numFallen = 0;
-        this.winner = "";
+        this.winner = null;
         for (Horse h : horses) {
             if (h != null) {
                 h.goBackToStart();
@@ -245,30 +250,48 @@ public class RacePanel extends JPanel
         super.paintComponent(g);
 
         int yPos = 200;
-        int xPos = 350;
+        int xPos = (450 - (int)(raceLength * 0.7));
+        //int offset = (int)(raceLength/2);
 
         // Cast Graphics to Graphics2D
         Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2dHorse = (Graphics2D) g;
 
         // Set the color for the string
         g2d.setColor(Color.BLACK);
         g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+        g2dHorse.setColor(Color.BLACK);
 
         // Define the string to draw
         String text = "Hello, world!";
-
+        g2d.drawLine(xPos, 180, xPos + raceLength, 180);
         for (int i = 0; i < numLanes; i++) {
+            g2d.drawLine(xPos, yPos+ 10, xPos  + raceLength, yPos + 10);
             if (i < horses.size() && horses.get(i) != null) {
                 //g2d.drawString(horses.get(i).getSymbol() + "", horses.get(i).getDistanceTravelled(), yPos);
-                printLane(horses.get(i), g2d, xPos, yPos);
+                printLane(horses.get(i), g2dHorse, xPos, yPos);
                 //System.out.print(" " + horses.get(i).getName() + " (Current confidence " + horses.get(i).getConfidence() + ")");
             } else {
                 printEmptyLane(g2d, xPos, yPos);
             }
+            //g2d.drawLine(xPos, yPos+ 10, raceLength + xPos, yPos + 10);
             yPos += 30;
         }
     }
 
+    /**
+     * Updates raceLength
+     */
+    public void updateRaceLength(int distance) {
+        this.raceLength = distance;
+    }
+
+    /**
+     * Updates numLanes
+     */
+    public void updateNumLanes(int lanes) {
+        this.numLanes = lanes;
+    }
 
     /**
      * checks if all the horses have fallen in the race
@@ -289,8 +312,6 @@ public class RacePanel extends JPanel
      */
     private void printLane(Horse horse, Graphics2D g2d, int xPos, int yPos)
     {
-
-        g2d.drawLine(xPos, yPos+ 10, raceLength + xPos, yPos + 10);
         
         //if the horse has fallen then print dead
         //else print the horse's symbol
@@ -312,7 +333,6 @@ public class RacePanel extends JPanel
      */
     private void printEmptyLane(Graphics2D g2d, int xPos, int yPos)
     {
-        g2d.drawLine(xPos, yPos+ 10, raceLength + xPos, yPos + 10);
         g2d.drawString(" ", xPos, yPos);
     }
 
@@ -341,7 +361,7 @@ public class RacePanel extends JPanel
     }
 
     public String getWinner() {
-        if (!winner.equals("")) {
+        if (winner != null) {
             return this.winner;
         } else {
             return "No one won.";

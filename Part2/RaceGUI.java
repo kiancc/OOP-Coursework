@@ -16,6 +16,8 @@ public class RaceGUI extends JFrame {
         // Set the title of the frame
         setTitle("Horse Race");
 
+        this.setBackground(Color.YELLOW);
+
         // Set the default close operation
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -26,13 +28,11 @@ public class RaceGUI extends JFrame {
         // Create a GuiRacePanel with the desired parameters
         racePanel = new RacePanel(100, 5); // Modify the parameters as needed
         racePanel.setRaceGUI(this);
-        
         try {
             readInHorses(racePanel);
         } catch (IOException e) {
-            
-        }
 
+        }
 
         // Create a button to start the race
         JButton startButton = new JButton("Start Race");
@@ -53,6 +53,17 @@ public class RaceGUI extends JFrame {
         // Create a panel to hold the button
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(startButton);
+
+
+        // Create a customize track button
+        JButton customizeTrackButton = new JButton("Customize Track");
+        customizeTrackButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                customiseTrack();
+            }
+        });
+        buttonPanel.add(customizeTrackButton);
 
         // Add the race panel and button panel to the frame
         add(racePanel, BorderLayout.CENTER);
@@ -75,6 +86,9 @@ public class RaceGUI extends JFrame {
         new RaceGUI(); // Create an instance of RaceGUI
     }
 
+    /*
+    * Read in horses and store in Race
+    */
     public static void  readInHorses(RacePanel racePanel) throws IOException {
         ArrayList<Horse> horses = new ArrayList<>();
         String filePath = "horses.dat";
@@ -105,5 +119,23 @@ public class RaceGUI extends JFrame {
                 // Handle IO exceptions
                 e.printStackTrace();
         }
+    }
+
+    // Apply customisations
+    public void applyCustomisation(int distance, int lanes) {
+        racePanel.updateRaceLength(distance);
+        racePanel.updateNumLanes(lanes);
+    }
+
+    
+    // open Customisation
+    private void customiseTrack() {
+        // Create the customization panel and wrap it in a dialog
+        CustomiseTrack ccustomiseTrack = new CustomiseTrack(this);
+        JDialog customiseDialog = new JDialog(this, "Customise Track", true);
+        customiseDialog.add(ccustomiseTrack);
+        customiseDialog.pack();
+        customiseDialog.setLocationRelativeTo(this); // Center the dialog
+        customiseDialog.setVisible(true);
     }
 }
