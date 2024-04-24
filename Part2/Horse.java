@@ -61,6 +61,10 @@ public class Horse implements Serializable
         return name;
     }
 
+    public HorseMetrics getHorseMetrics() {
+        return metrics;
+    }
+
     public boolean hasFallen()
     {
         return fallen;
@@ -73,13 +77,6 @@ public class Horse implements Serializable
 
     public Boolean getFinished() {
         return this.finished;
-    }
-
-    // added 01/04/2024
-    public void displayMetrics() {
-        System.out.println("Races Won: " + metrics.getRacesWon());
-        System.out.println("Average Finishing Position: " + metrics.getAvgFinishPosition());
-        System.out.println("Position History: " + metrics.getPositionHistory());
     }
 
     /**

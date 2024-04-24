@@ -24,6 +24,7 @@ public class Race
     private String winner;
     private List<RaceListener> listeners = new ArrayList<>();
     private int numFinished;
+    private boolean hasWon;
 
     /**
      * Constructor for objects of class Race
@@ -38,6 +39,7 @@ public class Race
         this.numLanes = numLanes;
         this.horses = new ArrayList<Horse>();
         this.winner = "";
+        this.hasWon = false;
     }
     
     /**
@@ -124,7 +126,8 @@ public class Race
                 horse.setFinished();
                 horse = updateHorseMetrics(horse, numFinished+1);
                 numFinished++;
-                if (numFinished - numFallen == 1) {
+                if (hasWon == false) {
+                    this.hasWon = true;
                     this.winner = horse.getName();
                 }
             }
@@ -169,6 +172,7 @@ public class Race
         this.numFinished = 0;
         this.numFallen = 0;
         this.winner = "";
+        this.hasWon = false;
         for (Horse h : horses) {
             if (h != null) {
                 h.goBackToStart();
@@ -389,16 +393,19 @@ public class Race
             objectIn.close();
             fileIn.close();
 
-        } catch (EOFException e) {
-                // This exception is thrown when the end of the file is reached
-                System.out.println("End of file reached.");
-        } catch (ClassNotFoundException e) {
-                // This exception is thrown if the class of the serialized object cannot be found
-                e.printStackTrace();
-        } catch (IOException e) {
-                System.out.println("No file found. New horses.dat created.");
-                return horseInput;
-        }     
+            } catch (EOFException e) {
+                    // This exception is thrown when the end of the file is reached
+                    System.out.println("End of file reached.");
+            } catch (ClassNotFoundException e) {
+                    // This exception is thrown if the class of the serialized object cannot be found
+                    horseInput.put("Alpha", new Horse('A', "Alpha", 0.7));
+                    horseInput.put("Beta", new Horse('B', "Beta", 0.8));
+                    horseInput.put("Charlie", new Horse('C', "Charlie", 0.6));
+                    e.printStackTrace();
+            } catch (IOException e) {
+                    System.out.println("No file found. New horses.dat created.");
+                    return horseInput;
+            }     
         return horseInput;
     }
 

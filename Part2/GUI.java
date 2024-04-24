@@ -4,6 +4,8 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class GUI extends JFrame implements RaceListener {  
     private int customRaceLength;
@@ -17,6 +19,7 @@ public class GUI extends JFrame implements RaceListener {
     private JButton customiseTrackButton;
     private JButton startRaceButton;
     private JButton customiseHorseButton;
+    private JButton bettingStaisticsButton;
 
     public GUI() {
         setTitle("Horse Race");
@@ -36,7 +39,7 @@ public class GUI extends JFrame implements RaceListener {
             horses.add(new Horse('A', "Alpha", 0.7));
             horses.add(new Horse('B', "Beta", 0.8));
             horses.add(new Horse('C', "Charlie", 0.6));
-        }
+        } 
 
         // Create the race object
         race = new Race(customRaceLength, horses.size()); // Adjust the parameters as needed
@@ -59,23 +62,27 @@ public class GUI extends JFrame implements RaceListener {
         buttonPanel.add(startRaceButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        /* implements track customisation*/
+        /* implements track customisation */
         customiseTrackButton = new JButton("Customize Track");
         customiseTrackButton.addActionListener(new CustomiseTrackListener());
         buttonPanel.add(customiseTrackButton);
 
-        /* implements horse customisation*/
+        /* implements horse customisation */
         customiseHorseButton = new JButton("Customize Horse");
         customiseHorseButton.addActionListener(new CustomiseHorseListener());
         buttonPanel.add(customiseHorseButton);
+
+        /* implements betting and statistics */
+        bettingStaisticsButton = new JButton("Betting & Statistics");
+        bettingStaisticsButton.addActionListener(new BettingStatisticsListener());
+        buttonPanel.add(bettingStaisticsButton);
 
         race.addRaceListener(this);
     }
 
     /* --------------------------------------------------  */
     // Code for betting statistics
-    /*
-
+    
     private class BettingStatisticsListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -84,20 +91,68 @@ public class GUI extends JFrame implements RaceListener {
     }
 
     private void showBettingStatisticsDialog() {
-        JPanel customisationPanel = new JPanel(new GridLayout(4, 2));
+        JPanel customisationPanel = new JPanel(new GridLayout(10, 2));
 
-        JLabel horseNameLabel = new JLabel("Horse Name: ");
-        JTextField horseNameField = new JTextField("");
-        customisationPanel.add(horseNameLabel);
-        customisationPanel.add(horseNameField);
+        // Create labels and fields for customization options
+        
+        JLabel horseConfidence = new JLabel("Confidence: ");
+        JLabel numFalls = new JLabel("Number of Falls: ");
+        JLabel numWins = new JLabel("Number of Wins: ");
+        JLabel averageFinishPos = new JLabel("Average Finishing Position: ");
+        JLabel totalRaces = new JLabel("Total Race Participations: ");
 
-        JLabel horseSymbolLabel = new JLabel("Horse Symbol:");
-        JTextField horseSymbolField = new JTextField("");
-        customisationPanel.add(horseSymbolLabel);
-        customisationPanel.add(horseSymbolField);
+        /*
+        JComboBox<String> dropDownMenu = new JComboBox<>(horsesStrings);
+        dropDownMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Get the selected item
+                String selectedItem = (String) dropDownMenu.getSelectedItem();
+                //displayHorseData(selectedItem);
+            }
+        });*/
 
-        int result = JOptionPane.showConfirmDialog(GUI.this, customisationPanel, "Customize Horse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        JLabel selectHorseLabel = new JLabel("Select Horse:");
+        String[] horsesStrings = getHorseNames(horses);
+        JComboBox<String> selectHorseComboBox = new JComboBox<>();
+        selectHorseComboBox.setModel(new DefaultComboBoxModel<>(horsesStrings));
+        //selectHorseComboBox.setSelectedItem(customTrackBoundary);
+        selectHorseComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    String selectedBoundary = (String) e.getItem();
+                    Horse horse = selectedHorse(selectedBoundary);
+                    double confidence = getSelectedHorseConfidence(horse);
+                    int falls = getSelectedHorseFalls(horse);
+                    int wins = getSelectedHorseWins(horse);
+                    double averagePos = getSelectedHorseAveragePosition(horse);
+                    int total = getSelectedHorseTotalRaces(horse);
+                    horseConfidence.setText("Confidence: " + confidence);
+                    numFalls.setText("Number of Falls: " + falls);
+                    numWins.setText("Number of Wins: " + wins);
+                    averageFinishPos.setText("Average Finishing Position: " + averagePos);
+                    totalRaces.setText("Total Race Participations: " + total);
+                }
+            }
+        });
 
+        customisationPanel.add(selectHorseLabel);
+        customisationPanel.add(selectHorseComboBox);
+
+        JLabel betAmountLabel = new JLabel("Bet Amount: ");
+        JTextField betAmountField = new JTextField("");
+        customisationPanel.add(betAmountLabel);
+        customisationPanel.add(betAmountField);
+
+        customisationPanel.add(horseConfidence);
+        customisationPanel.add(numFalls);
+        customisationPanel.add(numWins);
+        customisationPanel.add(averageFinishPos);
+        customisationPanel.add(totalRaces);
+
+        int result = JOptionPane.showConfirmDialog(GUI.this, customisationPanel, "Customise Horse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        /*
         if (result == JOptionPane.OK_OPTION) {
             try {
                 int horseNameLength = horseNameField.getText().length();
@@ -114,7 +169,49 @@ public class GUI extends JFrame implements RaceListener {
                 JOptionPane.showMessageDialog(GUI.this, "Invalid input for race length.", "Error", JOptionPane.ERROR_MESSAGE);
                 showBettingStatisticsDialog();
             }
+        }*/
+    }
+
+    private double getSelectedHorseConfidence(Horse horse) {
+        return horse.getConfidence();
+    }
+
+    private int getSelectedHorseFalls(Horse horse) {
+        return horse.getHorseMetrics().getFalls();
+    }
+
+    private int getSelectedHorseWins(Horse horse) {
+        return horse.getHorseMetrics().getRacesWon();
+    }
+
+    private double getSelectedHorseAveragePosition(Horse horse) {
+        return horse.getHorseMetrics().getAvgFinishPosition();
+    }
+
+    private int getSelectedHorseTotalRaces(Horse horse) {
+        return horse.getHorseMetrics().getRaces();
+    }
+
+    private Horse selectedHorse(String name) {
+        for (Horse horse : horses) {
+            if (horse.getName() == name) {
+                return horse;
+            }
         }
+        return null;
+    }
+
+    private String[] getHorseNames(ArrayList<Horse> horses) {
+        ArrayList<String> names = new ArrayList<>();
+        for (Horse horse : horses) {
+            if (horse != null) {
+                names.add(horse.getName());
+            }
+        }
+
+        String[] namesString = new String[names.size()];
+        namesString = names.toArray(namesString);
+        return namesString;
     }
 
     private void applyBet(Horse horse, int amount) {
@@ -123,7 +220,7 @@ public class GUI extends JFrame implements RaceListener {
         race.addHorse(horse);
         initialiseRace();
     }
-*/
+
     /* --------------------------------------------------  */
 
 
@@ -402,10 +499,15 @@ public class GUI extends JFrame implements RaceListener {
                 System.out.println("End of file reached.");
         } catch (ClassNotFoundException e) {
                 // This exception is thrown if the class of the serialized object cannot be found
+
                 e.printStackTrace();
         } catch (IOException e) {
                 // Handle IO exceptions
-                e.printStackTrace();
+                newHorses.add(new Horse('A', "Alpha", 0.7));
+                newHorses.add(new Horse('B', "Beta", 0.8));
+                newHorses.add(new Horse('C', "Charlie", 0.6));
+                System.out.println("No horses.dat file found. Initialising with basic horses.");
+                //e.printStackTrace();
         }
 
         return newHorses;
