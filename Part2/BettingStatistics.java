@@ -28,7 +28,6 @@ public class BettingStatistics extends JPanel {
         this.raceGUI = raceGUI;
 
         // Set the layout for the panel
-        setLayout(new GridLayout(10, 10));
 
         // Create labels and fields for customization options
         JLabel selectHorse = new JLabel("Select Horse:");
