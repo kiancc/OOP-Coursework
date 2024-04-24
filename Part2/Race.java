@@ -23,6 +23,7 @@ public class Race
     private int numFallen;
     private String winner;
     private List<RaceListener> listeners = new ArrayList<>();
+    private int numFinished;
 
     /**
      * Constructor for objects of class Race
@@ -118,19 +119,18 @@ public class Race
      */
 
      private boolean checkAllFinished() {
-        int numFinished = 0;
-        String tempWinner = "";
         for (Horse horse : horses) {
-            if (horse != null && horse.getDistanceTravelled() == raceLength) {
+            if (horse != null && horse.getDistanceTravelled() == raceLength && horse.getFinished() == false) {
+                horse.setFinished();
+                horse = updateHorseMetrics(horse, numFinished+1);
                 numFinished++;
-                tempWinner = horse.getName();
+                if (numFinished - numFallen == 1) {
+                    this.winner = horse.getName();
+                }
             }
         }
-        if (numFinished == 1 && winner.equals("")) {
-            winner = tempWinner;
-        }
 
-        if (numFinished == numHorses - numFallen) {
+        if (numFinished == numHorses) {
             return true;
         }
         return false;
@@ -155,11 +155,18 @@ public class Race
         }
     }
 
+    private Horse updateHorseMetrics(Horse horse, int position) {
+        horse.updateHMetrics(position, raceLength);
+        return horse;
+    }
+
+
 
     /**
      * Resets horses to beginning of race
      */
     private void resetLanes() {
+        this.numFinished = 0;
         this.numFallen = 0;
         this.winner = "";
         for (Horse h : horses) {
@@ -197,6 +204,7 @@ public class Race
                 theHorse.fall();
                 // ADDED 10/03/2024 decreases horses confidence by an arbitrary amount
                 theHorse = adjustConfidence(theHorse, -0.01);
+                numFinished++;
                 numFallen++;
                 return;
             }

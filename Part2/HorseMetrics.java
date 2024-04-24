@@ -1,7 +1,7 @@
 
 import java.util.*;
 import java.io.Serializable;
-
+import java.io.*;
 
 public class HorseMetrics implements Serializable  {
     private int totalDistance;

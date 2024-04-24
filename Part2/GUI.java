@@ -1,3 +1,4 @@
+import java.util.*;
 import javax.swing.*;
 import java.io.*;
 import java.awt.*;
@@ -9,6 +10,7 @@ public class GUI extends JFrame implements RaceListener {
     private int customNumLanes;
     private char customTrackBoundary;  
     private Race race;
+    private ArrayList<Horse> horses;
     private TrackCustomisation customisation;
     private Color customBackgroundColor;
     private JTextArea raceTrackTextArea;
@@ -26,8 +28,20 @@ public class GUI extends JFrame implements RaceListener {
         customRaceLength = 30;
         customNumLanes = 3;
 
+        // read in horses
+        try {
+            horses = readInHorses();
+        } catch (IOException e) {
+            System.out.println("Could not read in Horses! Defaul horses added.");
+            horses.add(new Horse('A', "Alpha", 0.7));
+            horses.add(new Horse('B', "Beta", 0.8));
+            horses.add(new Horse('C', "Charlie", 0.6));
+        }
+
         // Create the race object
-        race = new Race(customRaceLength, customNumLanes); // Adjust the parameters as needed
+        race = new Race(customRaceLength, horses.size()); // Adjust the parameters as needed
+
+        addHorsesToRace(race);
 
         // Create the components
         JPanel trackRacePanel = new JPanel();
@@ -44,13 +58,6 @@ public class GUI extends JFrame implements RaceListener {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(startRaceButton);
         add(buttonPanel, BorderLayout.SOUTH);
-
-        
-
-        // Add horses to the race (replace with your implementation)
-        race.addHorse(new Horse('H', "Horse 1", 0.8));
-        race.addHorse(new Horse('T', "Horse 2", 0.6));
-        race.addHorse(new Horse('R', "Horse 3", 0.9));
 
         /* implements track customisation*/
         customiseTrackButton = new JButton("Customize Track");
@@ -368,16 +375,10 @@ public class GUI extends JFrame implements RaceListener {
         raceTrackTextArea.setText(raceTrackBuilder.toString());
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            GUI gui = new GUI();
-            gui.setVisible(true);
-        });
-    }
-
     // reads in horses from file
-    private void  readInHorses(Race race) throws IOException {
+    private ArrayList<Horse> readInHorses() throws IOException {
         String filePath = "horses.dat";
+        ArrayList<Horse> newHorses = new ArrayList<>();
         //horses = new ArrayList<>();
         try {
             FileInputStream fileIn = new FileInputStream(filePath);
@@ -388,7 +389,7 @@ public class GUI extends JFrame implements RaceListener {
 
             while (horseObj != null) {
                 //horses.add(horseObj);
-                race.addHorse(horseObj);
+                newHorses.add(horseObj);
                 horseObj = (Horse) objectIn.readObject();
                 System.out.println("Read object: " + horseObj);
             }
@@ -406,6 +407,24 @@ public class GUI extends JFrame implements RaceListener {
                 // Handle IO exceptions
                 e.printStackTrace();
         }
+
+        return newHorses;
+    }
+
+    // add horses to race
+    private void addHorsesToRace(Race race) {
+        if (horses != null) {
+            for (Horse horse : horses) {
+                race.addHorse(horse);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            GUI gui = new GUI();
+            gui.setVisible(true);
+        });
     }
 
 }

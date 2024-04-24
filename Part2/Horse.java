@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
@@ -11,7 +9,7 @@ import java.io.Serializable;
  * @author (Kian Christian Chong) 
  * @version (10/03/2024 Version 1)
  */
-public class Horse
+public class Horse implements Serializable 
 {
     //Fields of class Horse
     private String name;
@@ -21,6 +19,7 @@ public class Horse
     private double confidence;
     private HorseMetrics metrics;
     private Color color;
+    private boolean finished;
       
     //Constructor of class Horse
     /**
@@ -35,6 +34,7 @@ public class Horse
         this.fallen = false;
         this.metrics = new HorseMetrics();
         this.color = new Color(255, 255, 255);
+        this.finished = false;
     }
     
     //Other methods of class Horse
@@ -71,6 +71,10 @@ public class Horse
         return symbol;
     }
 
+    public Boolean getFinished() {
+        return this.finished;
+    }
+
     // added 01/04/2024
     public void displayMetrics() {
         System.out.println("Races Won: " + metrics.getRacesWon());
@@ -100,6 +104,7 @@ public class Horse
     {
         this.distanceTravelled = 0;
         this.fallen = false;
+        this.finished = false;
     }
 
     public void moveForward()
@@ -126,6 +131,10 @@ public class Horse
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public void setFinished() {
+        this.finished = true;
     }
 
     /**
