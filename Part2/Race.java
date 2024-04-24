@@ -124,7 +124,7 @@ public class Race
         for (Horse horse : horses) {
             if (horse != null && horse.getDistanceTravelled() == raceLength && horse.getFinished() == false) {
                 horse.setFinished();
-                horse = updateHorseMetrics(horse, numFinished+1);
+                horse = updateHorseMetrics(horse, numFinished+1 - numFallen);
                 numFinished++;
                 if (hasWon == false) {
                     this.hasWon = true;
@@ -148,6 +148,7 @@ public class Race
             if (horse.getName().equals(winner)) {
                 // added winning message with horses name
                 horse = adjustConfidence(horse, 0.01);
+                horse.win();
                 System.out.println("And the winner is " + horse.getName() + " Confidence: " + horse.getConfidence());
             }
         }
@@ -194,6 +195,7 @@ public class Race
         
         if  (!theHorse.hasFallen() && theHorse.getDistanceTravelled() != raceLength)
         {
+            theHorse.updateTime();
             //the probability that the horse will move forward depends on the confidence;
             if (Math.random() < theHorse.getConfidence())
             {

@@ -20,6 +20,7 @@ public class Horse implements Serializable
     private HorseMetrics metrics;
     private Color color;
     private boolean finished;
+    private int time;
       
     //Constructor of class Horse
     /**
@@ -41,6 +42,7 @@ public class Horse implements Serializable
     public void fall()
     {
         this.fallen = true;
+        metrics.updateFall();
     }
     
     /**
@@ -86,9 +88,7 @@ public class Horse implements Serializable
     // Added 01/04/2024
     // updates horse metrics 
     public void updateHMetrics(int position, int raceLength) {
-        // note time does not work
-        double time = (double)distanceTravelled;
-        metrics.updateMetrics(distanceTravelled, time, fallen, position);
+        metrics.updateMetrics(distanceTravelled, time, position);
     }
 
     // Added 01/04/2024
@@ -96,7 +96,7 @@ public class Horse implements Serializable
     public void win() {
         metrics.updateWin();
     }
-    
+
     public void goBackToStart()
     {
         this.distanceTravelled = 0;
@@ -132,6 +132,10 @@ public class Horse implements Serializable
 
     public void setFinished() {
         this.finished = true;
+    }
+
+    public void updateTime() {
+        time++;
     }
 
     /**

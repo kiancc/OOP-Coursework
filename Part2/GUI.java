@@ -100,6 +100,7 @@ public class GUI extends JFrame implements RaceListener {
         JLabel numWins = new JLabel("Number of Wins: ");
         JLabel averageFinishPos = new JLabel("Average Finishing Position: ");
         JLabel totalRaces = new JLabel("Total Race Participations: ");
+        JLabel averageSpeed = new JLabel("Average Speed: ");
 
         /*
         JComboBox<String> dropDownMenu = new JComboBox<>(horsesStrings);
@@ -128,11 +129,13 @@ public class GUI extends JFrame implements RaceListener {
                     int wins = getSelectedHorseWins(horse);
                     double averagePos = getSelectedHorseAveragePosition(horse);
                     int total = getSelectedHorseTotalRaces(horse);
+                    double avgSpeed = horse.getHorseMetrics().getAverageSpeed();
                     horseConfidence.setText("Confidence: " + confidence);
                     numFalls.setText("Number of Falls: " + falls);
                     numWins.setText("Number of Wins: " + wins);
                     averageFinishPos.setText("Average Finishing Position: " + averagePos);
                     totalRaces.setText("Total Race Participations: " + total);
+                    averageSpeed.setText("Average Speed : " + avgSpeed);
                 }
             }
         });
@@ -149,7 +152,9 @@ public class GUI extends JFrame implements RaceListener {
         customisationPanel.add(numFalls);
         customisationPanel.add(numWins);
         customisationPanel.add(averageFinishPos);
+        customisationPanel.add(averageSpeed);
         customisationPanel.add(totalRaces);
+        
 
         int result = JOptionPane.showConfirmDialog(GUI.this, customisationPanel, "Customise Horse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         /*

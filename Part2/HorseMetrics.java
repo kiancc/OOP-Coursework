@@ -26,12 +26,9 @@ public class HorseMetrics implements Serializable  {
     /*
      * updates horse metrics afer a race
      */
-    public void updateMetrics(int distance, double time, boolean fall, int position) {
+    public void updateMetrics(int distance, double time, int position) {
         totalDistance += distance;
         totalTime += time;
-        if (fall) {
-            numFalls++;
-        }
         positionHistory.push(position);
         numRaces++;
     }
@@ -41,6 +38,10 @@ public class HorseMetrics implements Serializable  {
      */
     public void updateWin() {
         numWon++;
+    }
+
+    public void updateFall() {
+        numFalls++;
     }
 
     // getter methods
