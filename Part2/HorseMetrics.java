@@ -1,6 +1,9 @@
-import java.util.*;
 
-public class HorseMetrics {
+import java.util.*;
+import java.io.Serializable;
+
+
+public class HorseMetrics implements Serializable  {
     private int totalDistance;
     private double totalTime;
     private int numWon;

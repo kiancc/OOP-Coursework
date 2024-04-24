@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.swing.*;
+import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Write a description of class Horse here.
@@ -17,6 +20,7 @@ public class Horse
     private boolean fallen;
     private double confidence;
     private HorseMetrics metrics;
+    private Color color;
       
     //Constructor of class Horse
     /**
@@ -30,6 +34,7 @@ public class Horse
         this.distanceTravelled = 0;
         this.fallen = false;
         this.metrics = new HorseMetrics();
+        this.color = new Color(255, 255, 255);
     }
     
     //Other methods of class Horse
@@ -119,33 +124,13 @@ public class Horse
         this.symbol = newSymbol;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     /**
      * IO methods
      */
 
-     // reads in saved Horse
-    public Horse loadHorse() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("levelSave.txt"))) {
-            String line;
-            String name = "";
-            char symbol = '\0';
-            double confidence = 0;
-            int i = 0;
-            while ((line = reader.readLine()) != null) {
-                if (i == 0) {
-                    symbol = line.charAt(0);
-                }
-                if (i == 1) {
-                    name = line;
-                }
-                if (i == 2) {
-                    confidence = Double.parseDouble(line);
-                }
-            }
-            return new Horse(symbol, name, confidence);
-        } catch (IOException e) {
-            System.err.println("File does not exist, initialising new level: " + e.getMessage());
-        }
-        return null;
-    }
+
 }
