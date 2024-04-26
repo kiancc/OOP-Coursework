@@ -11,6 +11,7 @@ public class GUI extends JFrame implements RaceListener {
     private int customRaceLength;
     private int customNumLanes;
     private int betAmount;
+    private double horseOdds;
     private int wallet;
     private String horseBet;
     private char customTrackBoundary;  
@@ -108,29 +109,17 @@ public class GUI extends JFrame implements RaceListener {
     }
 
     private void showBettingStatisticsDialog() {
-        JPanel customisationPanel = new JPanel(new GridLayout(10, 2));
+        JPanel customisationPanel = new JPanel(new GridLayout(11, 2));
 
         // Create labels and fields for customization options
-        
         JLabel horseConfidence = new JLabel("Confidence: ");
         JLabel numFalls = new JLabel("Number of Falls: ");
         JLabel numWins = new JLabel("Number of Wins: ");
         JLabel averageFinishPos = new JLabel("Average Finishing Position: ");
         JLabel totalRaces = new JLabel("Total Race Participations: ");
         JLabel averageSpeed = new JLabel("Average Speed: ");
-
-        /*
-        JComboBox<String> dropDownMenu = new JComboBox<>(horsesStrings);
-        dropDownMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Get the selected item
-                String selectedItem = (String) dropDownMenu.getSelectedItem();
-                //displayHorseData(selectedItem);
-            }
-        });*/
-
         JLabel selectHorseLabel = new JLabel("Select Horse:");
+        JLabel oddsLabel = new JLabel("Odds: ");
         String[] horsesStrings = getHorseNames(horses);
         JComboBox<String> selectHorseComboBox = new JComboBox<>();
         selectHorseComboBox.setModel(new DefaultComboBoxModel<>(horsesStrings));
@@ -147,12 +136,16 @@ public class GUI extends JFrame implements RaceListener {
                     double averagePos = getSelectedHorseAveragePosition(horse);
                     int total = getSelectedHorseTotalRaces(horse);
                     double avgSpeed = horse.getHorseMetrics().getAverageSpeed();
-                    horseConfidence.setText("Confidence: " + confidence);
+                    
+                    horseConfidence.setText("Confidence: " + String.format("%.2f", confidence));
                     numFalls.setText("Number of Falls: " + falls);
                     numWins.setText("Number of Wins: " + wins);
-                    averageFinishPos.setText("Average Finishing Position: " + averagePos);
+                    averageFinishPos.setText("Average Finishing Position: " + String.format("%.2f", averagePos));
                     totalRaces.setText("Total Race Participations: " + total);
-                    averageSpeed.setText("Average Speed : " + avgSpeed);
+                    averageSpeed.setText("Average Speed : " + String.format("%.2f", avgSpeed));
+                    double odd = getOdds(confidence, wins, total, averagePos);
+                    horseOdds = odd;
+                    oddsLabel.setText("Odds: " + String.format("%.2f", odd));
                     horseBet = horse.getName();
                 }
             }
@@ -165,22 +158,24 @@ public class GUI extends JFrame implements RaceListener {
         JTextField betAmountField = new JTextField("");
         customisationPanel.add(betAmountLabel);
         customisationPanel.add(betAmountField);
-
         customisationPanel.add(horseConfidence);
         customisationPanel.add(numFalls);
         customisationPanel.add(numWins);
         customisationPanel.add(averageFinishPos);
         customisationPanel.add(averageSpeed);
         customisationPanel.add(totalRaces);
-        
+        customisationPanel.add(oddsLabel);
 
         int result = JOptionPane.showConfirmDialog(GUI.this, customisationPanel, "Customise and Add Horse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         
         if (result == JOptionPane.OK_OPTION) {
             int bet = Integer.parseInt(betAmountField.getText());
             try {
-                
-                if (bet < 0 ) {
+                if (betAmountField.getText().equals("")) {
+                    JOptionPane.showMessageDialog(this, "Please Enter Bet Amount", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                    showBettingStatisticsDialog();
+                }
+                else if (bet < 0 ) {
                     JOptionPane.showMessageDialog(this, "Bet must be greater than 0", "Invalid Input", JOptionPane.WARNING_MESSAGE);
                     showBettingStatisticsDialog();
                 } else if (bet > wallet){
@@ -195,6 +190,11 @@ public class GUI extends JFrame implements RaceListener {
                 showBettingStatisticsDialog();
             }
         }
+    }
+
+    private double getOdds(double confidence, int wins, int totalRaces, double averageFinishPos) {
+        double odds = (1/confidence);
+        return odds;
     }
 
     private double getSelectedHorseConfidence(Horse horse) {
@@ -419,15 +419,17 @@ public class GUI extends JFrame implements RaceListener {
             winnerLabel.setText("Winner: " + race.getWinner());
             if (!race.getWinner().equals("")) {
                 if (horseBet != null && race.getWinner().equals(horseBet)) {
-                    wallet += betAmount;
+                    wallet += betAmount * horseOdds;
                     walletLabel.setText("Wallet: " + wallet); // Update the walletLabel
-                    JOptionPane.showMessageDialog(GUI.this, "Congratulations! You won " + betAmount + " credits.");
+                    JOptionPane.showMessageDialog(GUI.this, (String.format("%2f" + "Congratulations! You won " + betAmount * horseOdds + " credits.")));
                 }
             }
         } else {
             winnerLabel.setText("No winner");
         }
         enableStartRaceButton();
+        horseOdds = 0;
+        betAmount = 0;
     }
 
     private void enableStartRaceButton() {
@@ -528,9 +530,9 @@ public class GUI extends JFrame implements RaceListener {
                 e.printStackTrace();
         } catch (IOException e) {
                 // Handle IO exceptions
-                newHorses.add(new Horse('A', "Alpha", 0.7));
-                newHorses.add(new Horse('B', "Beta", 0.8));
-                newHorses.add(new Horse('C', "Charlie", 0.6));
+                newHorses.add(new Horse('♔', "Alpha", 0.7));
+                newHorses.add(new Horse('♘', "Beta", 0.7));
+                newHorses.add(new Horse('♛', "Charlie", 0.7));
                 System.out.println("No horses.dat file found. Initialising with basic horses.");
                 //e.printStackTrace();
         }
