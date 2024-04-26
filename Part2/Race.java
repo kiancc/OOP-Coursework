@@ -1,7 +1,12 @@
 import java.util.concurrent.TimeUnit;
 import java.lang.Math;
 import java.util.*;
+import java.io.*;
 
+interface RaceListener {
+    void onRaceUpdate();
+    void onRaceFinished();
+}
 /**
  * A three-horse race, each horse running in its own lane
  * for a given distance
@@ -17,6 +22,9 @@ public class Race
     private int numHorses;
     private int numFallen;
     private String winner;
+    private List<RaceListener> listeners = new ArrayList<>();
+    private int numFinished;
+    private boolean hasWon;
 
     /**
      * Constructor for objects of class Race
@@ -31,6 +39,7 @@ public class Race
         this.numLanes = numLanes;
         this.horses = new ArrayList<Horse>();
         this.winner = "";
+        this.hasWon = false;
     }
     
     /**
@@ -42,8 +51,12 @@ public class Race
      */
     public void addHorse(Horse theHorse)
     {
-        this.horses.add(theHorse);
-        numHorses++;
+        if (numHorses == numLanes) {
+            System.out.println("The race is full! No more horses can be added.");
+        } else {
+            this.horses.add(theHorse);
+            numHorses++;
+        }
     }
 
     
@@ -53,7 +66,7 @@ public class Race
      * then repeatedly moved forward until the 
      * race is finished
      */
-    public void startRace()
+    public void startRace() throws IOException
     {
         //declare a local variable to tell us when the race is finished
         boolean finished = false;
@@ -65,6 +78,11 @@ public class Race
         {
             //move horses
             moveHorses();
+
+            // Notify listeners of the race update
+            for (RaceListener listener : listeners) {
+                listener.onRaceUpdate();
+            }
                         
             //print the race positions
             printRace();
@@ -81,6 +99,9 @@ public class Race
                 TimeUnit.MILLISECONDS.sleep(100);
             }catch(Exception e){}
         }
+
+        Map<String, Horse> horseInput = read();
+        save(horseInput);
     }
 
     /**
@@ -100,19 +121,19 @@ public class Race
      */
 
      private boolean checkAllFinished() {
-        int numFinished = 0;
-        String tempWinner = "";
         for (Horse horse : horses) {
-            if (horse.getDistanceTravelled() == raceLength) {
+            if (horse != null && horse.getDistanceTravelled() == raceLength && horse.getFinished() == false) {
+                horse.setFinished();
+                horse = updateHorseMetrics(horse, numFinished+1 - numFallen);
                 numFinished++;
-                tempWinner = horse.getName();
+                if (hasWon == false) {
+                    this.hasWon = true;
+                    this.winner = horse.getName();
+                }
             }
         }
-        if (numFinished == 1 && winner.equals("")) {
-            winner = tempWinner;
-        }
 
-        if (numFinished == numHorses - numFallen) {
+        if (numFinished == numHorses) {
             return true;
         }
         return false;
@@ -127,18 +148,32 @@ public class Race
             if (horse.getName().equals(winner)) {
                 // added winning message with horses name
                 horse = adjustConfidence(horse, 0.01);
+                horse.win();
                 System.out.println("And the winner is " + horse.getName() + " Confidence: " + horse.getConfidence());
             }
         }
+
+        // Notify listeners that the race is finished
+        for (RaceListener listener : listeners) {
+            listener.onRaceFinished();
+        }
     }
+
+    private Horse updateHorseMetrics(Horse horse, int position) {
+        horse.updateHMetrics(position, raceLength);
+        return horse;
+    }
+
 
 
     /**
      * Resets horses to beginning of race
      */
     private void resetLanes() {
+        this.numFinished = 0;
         this.numFallen = 0;
         this.winner = "";
+        this.hasWon = false;
         for (Horse h : horses) {
             if (h != null) {
                 h.goBackToStart();
@@ -160,6 +195,7 @@ public class Race
         
         if  (!theHorse.hasFallen() && theHorse.getDistanceTravelled() != raceLength)
         {
+            theHorse.updateTime();
             //the probability that the horse will move forward depends on the confidence;
             if (Math.random() < theHorse.getConfidence())
             {
@@ -171,10 +207,10 @@ public class Race
             //so if you double the confidence, the probability that it will fall is *2
             if (Math.random() < (0.1*theHorse.getConfidence()*theHorse.getConfidence()))
             {
-                // ADDED 10/03/2024 ONE LINE BELOW: changes the symbol of the horse if it has fallen
                 theHorse.fall();
                 // ADDED 10/03/2024 decreases horses confidence by an arbitrary amount
                 theHorse = adjustConfidence(theHorse, -0.01);
+                numFinished++;
                 numFallen++;
                 return;
             }
@@ -217,6 +253,10 @@ public class Race
     private boolean hasAllFallen() {
         if (numFallen == numHorses) {
             System.out.println("All the horses have fallen.");
+            // Notify listeners that the race is finished
+            for (RaceListener listener : listeners) {
+                listener.onRaceFinished();
+            }
             return true;
         }
         return false;
@@ -245,7 +285,8 @@ public class Race
         //else print the horse's symbol
         if(theHorse.hasFallen())
         {
-            System.out.print('\u2322');
+            System.out.print('\u274C');
+            //\u274C
         }
         else
         {
@@ -299,6 +340,105 @@ public class Race
         {
             System.out.print(aChar);
             i = i + 1;
+        }
+    }
+
+    public int getNumLanes() {
+        return this.numLanes;
+    }
+
+    public int getRaceLength() {
+        return this.raceLength;
+    }
+
+    public ArrayList<Horse> getHorses() {
+        return this.horses;
+    }
+
+    public void addRaceListener(RaceListener listener) {
+        listeners.add(listener);
+    }
+
+    public void updateRaceLength(int raceLength) {
+        this.raceLength = raceLength;
+    }
+
+    public void updateNumLanes(int numLanes) {
+        this.numLanes = numLanes;
+    }
+
+    public String getWinner() {
+        return this.winner;
+    }
+
+    /**
+     * File IO
+     */
+
+    public Map<String, Horse> read() throws IOException {
+        Map<String, Horse> horseInput = new HashMap<>();
+        try {
+            String filePath = "horses.dat";
+            FileInputStream fileIn = new FileInputStream(filePath);
+            ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+
+            // Read the object from the file
+            Horse horseObj = (Horse) objectIn.readObject();
+
+            while (horseObj != null) {
+                horseInput.put(horseObj.getName(), horseObj);
+                horseObj = (Horse) objectIn.readObject();
+                System.out.println("Read object: " + horseObj.getName());
+            }
+
+            // Close the ObjectInputStream and FileInputStream
+            objectIn.close();
+            fileIn.close();
+
+            } catch (EOFException e) {
+                    // This exception is thrown when the end of the file is reached
+                    System.out.println("End of file reached.");
+            } catch (ClassNotFoundException e) {
+                    // This exception is thrown if the class of the serialized object cannot be found
+                    horseInput.put("Alpha", new Horse('A', "Alpha", 0.7));
+                    horseInput.put("Beta", new Horse('B', "Beta", 0.8));
+                    horseInput.put("Charlie", new Horse('C', "Charlie", 0.6));
+                    e.printStackTrace();
+            } catch (IOException e) {
+                    System.out.println("No file found. New horses.dat created.");
+                    return horseInput;
+            }     
+        return horseInput;
+    }
+
+    public void save(Map<String, Horse> horseInput) throws IOException {
+        try {
+            for (Horse horse : horses) {
+                if (horse != null) {
+                    if (horseInput.containsKey(horse.getName())) {
+                        horseInput.replace(horse.getName(), horse);
+                    } else {
+                        horseInput.put(horse.getName(), horse);
+                    }
+                }
+
+            }
+
+            FileOutputStream f = new FileOutputStream(new File("horses.dat"));
+			ObjectOutputStream o = new ObjectOutputStream(f);
+
+            for (Horse value : horseInput.values()) {
+                System.out.println("Written: " + value.getName());
+                o.writeObject(value);
+            }
+
+			o.close();
+			f.close();
+
+
+        } catch (IOException e) {
+                // Handle IO exceptions
+                e.printStackTrace();
         }
     }
 

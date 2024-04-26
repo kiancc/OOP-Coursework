@@ -1,6 +1,7 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import javax.swing.*;
+import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Write a description of class Horse here.
@@ -8,7 +9,7 @@ import java.io.IOException;
  * @author (Kian Christian Chong) 
  * @version (10/03/2024 Version 1)
  */
-public class Horse
+public class Horse implements Serializable 
 {
     //Fields of class Horse
     private String name;
@@ -17,6 +18,9 @@ public class Horse
     private boolean fallen;
     private double confidence;
     private HorseMetrics metrics;
+    private Color color;
+    private boolean finished;
+    private int time;
       
     //Constructor of class Horse
     /**
@@ -30,12 +34,15 @@ public class Horse
         this.distanceTravelled = 0;
         this.fallen = false;
         this.metrics = new HorseMetrics();
+        this.color = new Color(255, 255, 255);
+        this.finished = false;
     }
     
     //Other methods of class Horse
     public void fall()
     {
         this.fallen = true;
+        metrics.updateFall();
     }
     
     /**
@@ -56,6 +63,10 @@ public class Horse
         return name;
     }
 
+    public HorseMetrics getHorseMetrics() {
+        return metrics;
+    }
+
     public boolean hasFallen()
     {
         return fallen;
@@ -66,11 +77,8 @@ public class Horse
         return symbol;
     }
 
-    // added 01/04/2024
-    public void displayMetrics() {
-        System.out.println("Races Won: " + metrics.getRacesWon());
-        System.out.println("Average Finishing Position: " + metrics.getAvgFinishPosition());
-        System.out.println("Position History: " + metrics.getPositionHistory());
+    public Boolean getFinished() {
+        return this.finished;
     }
 
     /**
@@ -80,9 +88,7 @@ public class Horse
     // Added 01/04/2024
     // updates horse metrics 
     public void updateHMetrics(int position, int raceLength) {
-        // note time does not work
-        double time = (double)distanceTravelled;
-        metrics.updateMetrics(distanceTravelled, time, fallen, position);
+        metrics.updateMetrics(distanceTravelled, time, position);
     }
 
     // Added 01/04/2024
@@ -90,11 +96,12 @@ public class Horse
     public void win() {
         metrics.updateWin();
     }
-    
+
     public void goBackToStart()
     {
         this.distanceTravelled = 0;
         this.fallen = false;
+        this.finished = false;
     }
 
     public void moveForward()
@@ -119,33 +126,21 @@ public class Horse
         this.symbol = newSymbol;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public void setFinished() {
+        this.finished = true;
+    }
+
+    public void updateTime() {
+        time++;
+    }
+
     /**
      * IO methods
      */
 
-     // reads in saved Horse
-    public Horse loadHorse() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("levelSave.txt"))) {
-            String line;
-            String name = "";
-            char symbol = '\0';
-            double confidence = 0;
-            int i = 0;
-            while ((line = reader.readLine()) != null) {
-                if (i == 0) {
-                    symbol = line.charAt(0);
-                }
-                if (i == 1) {
-                    name = line;
-                }
-                if (i == 2) {
-                    confidence = Double.parseDouble(line);
-                }
-            }
-            return new Horse(symbol, name, confidence);
-        } catch (IOException e) {
-            System.err.println("File does not exist, initialising new level: " + e.getMessage());
-        }
-        return null;
-    }
+
 }
