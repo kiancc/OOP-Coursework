@@ -549,7 +549,7 @@ public class GUI extends JFrame implements RaceListener {
         }
     }
 
-    public static void main(String[] args) {
+    public static void startRaceGUI(String[] args) {
         SwingUtilities.invokeLater(() -> {
             GUI gui = new GUI();
             gui.setVisible(true);
