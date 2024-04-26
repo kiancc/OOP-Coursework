@@ -10,12 +10,16 @@ import java.awt.event.ItemEvent;
 public class GUI extends JFrame implements RaceListener {  
     private int customRaceLength;
     private int customNumLanes;
+    private int betAmount;
+    private int wallet;
+    private String horseBet;
     private char customTrackBoundary;  
     private Race race;
     private ArrayList<Horse> horses;
     private TrackCustomisation customisation;
     private Color customBackgroundColor;
     private JTextArea raceTrackTextArea;
+    private JTextArea winnerMsg;
     private JButton customiseTrackButton;
     private JButton startRaceButton;
     private JButton customiseHorseButton;
@@ -27,6 +31,10 @@ public class GUI extends JFrame implements RaceListener {
         setSize(800, 600);
         setLayout(new BorderLayout());
 
+        winnerMsg = new JTextArea("");
+        
+        add(winnerMsg);
+
         customTrackBoundary = '=';
         customRaceLength = 30;
         customNumLanes = 3;
@@ -35,7 +43,7 @@ public class GUI extends JFrame implements RaceListener {
         try {
             horses = readInHorses();
         } catch (IOException e) {
-            System.out.println("Could not read in Horses! Defaul horses added.");
+            System.out.println("Could not read in Horses! Default horses added.");
             horses.add(new Horse('A', "Alpha", 0.7));
             horses.add(new Horse('B', "Beta", 0.8));
             horses.add(new Horse('C', "Charlie", 0.6));
@@ -43,6 +51,8 @@ public class GUI extends JFrame implements RaceListener {
 
         // Create the race object
         race = new Race(customRaceLength, horses.size()); // Adjust the parameters as needed
+
+        wallet = 100; // default amount for wallet
 
         addHorsesToRace(race);
 
@@ -136,6 +146,7 @@ public class GUI extends JFrame implements RaceListener {
                     averageFinishPos.setText("Average Finishing Position: " + averagePos);
                     totalRaces.setText("Total Race Participations: " + total);
                     averageSpeed.setText("Average Speed : " + avgSpeed);
+                    horseBet = horse.getName();
                 }
             }
         });
@@ -156,25 +167,27 @@ public class GUI extends JFrame implements RaceListener {
         customisationPanel.add(totalRaces);
         
 
-        int result = JOptionPane.showConfirmDialog(GUI.this, customisationPanel, "Customise Horse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        /*
+        int result = JOptionPane.showConfirmDialog(GUI.this, customisationPanel, "Customise and Add Horse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
         if (result == JOptionPane.OK_OPTION) {
+            int bet = Integer.parseInt(betAmountField.getText());
             try {
-                int horseNameLength = horseNameField.getText().length();
-                if (horseNameLength < 0 || horseNameLength > 50) {
-                    JOptionPane.showMessageDialog(this, "Horse name must be between " + 1 + " and " + 50 + " characters.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                
+                if (bet < 0 ) {
+                    JOptionPane.showMessageDialog(this, "Bet must be greater than 0", "Invalid Input", JOptionPane.WARNING_MESSAGE);
                     showBettingStatisticsDialog();
+                } else if (bet > wallet){
+                    JOptionPane.showMessageDialog(this, "You do not have enough money.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                    showBettingStatisticsDialog();               
                 } else {
-                    //customisation = new TrackCustomisation(newRaceLength, newTrackBoundary, customBackgroundColor, newNumLanes);
-                    Horse newHorse = new Horse(horseSymbolField.getText().charAt(0), horseNameField.getText(), 0.6);
-                    applyBet();
+                    applyBet(bet);
                 }
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(GUI.this, "Invalid input for race length.", "Error", JOptionPane.ERROR_MESSAGE);
                 showBettingStatisticsDialog();
             }
-        }*/
+        }
     }
 
     private double getSelectedHorseConfidence(Horse horse) {
@@ -219,10 +232,9 @@ public class GUI extends JFrame implements RaceListener {
         return namesString;
     }
 
-    private void applyBet(Horse horse, int amount) {
-        int newNumLanes = race.getNumLanes() + 1;
-        race.updateNumLanes(newNumLanes);
-        race.addHorse(horse);
+    private void applyBet(int bet) {
+        wallet -= bet;
+        betAmount = bet;
         initialiseRace();
     }
 
@@ -289,7 +301,6 @@ public class GUI extends JFrame implements RaceListener {
         race.updateNumLanes(newNumLanes);
         race.addHorse(horse);
         initialiseRace();
-
     }
 
     /* --------------------------------------------------  */
@@ -384,11 +395,17 @@ public class GUI extends JFrame implements RaceListener {
         public void actionPerformed(ActionEvent e) {
             startRaceButton.setEnabled(false);
             applyCustomisation();
+            winnerMsg.setText("");
+            //applyBet();
             Thread raceThread = new Thread(() -> {
                 try {
                     race.startRace();
                     updateRaceTrack();
                     if (!race.getWinner().equals("")) {
+                        winnerMsg.setText("Winner is " + race.getWinner());
+                        if (horseBet != null && race.getWinner().equals(horseBet)) {
+                            wallet += betAmount;
+                        }
                     }
                 } catch (IOException ex) {
                     // handle the exception here
@@ -396,6 +413,7 @@ public class GUI extends JFrame implements RaceListener {
                 }
 
             });
+            
             raceThread.start();
         }
     }
