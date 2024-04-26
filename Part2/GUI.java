@@ -19,6 +19,7 @@ public class GUI extends JFrame implements RaceListener {
     private TrackCustomisation customisation;
     private Color customBackgroundColor;
     private JLabel winnerLabel;
+    private JLabel walletLabel;
     private JTextArea raceTrackTextArea;
     private JButton customiseTrackButton;
     private JButton startRaceButton;
@@ -49,6 +50,10 @@ public class GUI extends JFrame implements RaceListener {
         race = new Race(customRaceLength, horses.size()); // Adjust the parameters as needed
 
         wallet = 100; // default amount for wallet
+
+        walletLabel = new JLabel("Wallet: " + wallet);
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(walletLabel, BorderLayout.NORTH);
 
         addHorsesToRace(race);
 
@@ -86,7 +91,8 @@ public class GUI extends JFrame implements RaceListener {
         bettingStaisticsButton.addActionListener(new BettingStatisticsListener());
         buttonPanel.add(bettingStaisticsButton);
 
-        
+        bottomPanel.add(buttonPanel, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         race.addRaceListener(this);
     }
@@ -236,6 +242,7 @@ public class GUI extends JFrame implements RaceListener {
     private void applyBet(int bet) {
         wallet -= bet;
         betAmount = bet;
+        walletLabel.setText("Wallet: " + wallet); // Update the walletLabel
         initialiseRace();
     }
 
@@ -390,11 +397,6 @@ public class GUI extends JFrame implements RaceListener {
                 try {
                     race.startRace();
                     updateRaceTrack();
-                    if (!race.getWinner().equals("")) {
-                        if (horseBet != null && race.getWinner().equals(horseBet)) {
-                            wallet += betAmount;
-                        }
-                    }
                 } catch (IOException ex) {
                     // handle the exception here
                     ex.printStackTrace();
@@ -415,6 +417,13 @@ public class GUI extends JFrame implements RaceListener {
     public void onRaceFinished() {
         if (!race.getWinner().isEmpty()) {
             winnerLabel.setText("Winner: " + race.getWinner());
+            if (!race.getWinner().equals("")) {
+                if (horseBet != null && race.getWinner().equals(horseBet)) {
+                    wallet += betAmount;
+                    walletLabel.setText("Wallet: " + wallet); // Update the walletLabel
+                    JOptionPane.showMessageDialog(GUI.this, "Congratulations! You won " + betAmount + " credits.");
+                }
+            }
         } else {
             winnerLabel.setText("No winner");
         }
@@ -433,7 +442,7 @@ public class GUI extends JFrame implements RaceListener {
         for (int i = 0; i < race.getNumLanes(); i++) {
             if (i < race.getHorses().size() && race.getHorses().get(i) != null) {
                 printLane(raceTrackBuilder, race.getHorses().get(i));
-                raceTrackBuilder.append(" ").append(race.getHorses().get(i).getName()).append(" (Current confidence ").append(race.getHorses().get(i).getConfidence()).append(")");
+                raceTrackBuilder.append(" ").append(race.getHorses().get(i).getName()).append(" (Current confidence ").append(String.format("%.2f", race.getHorses().get(i).getConfidence())).append(")");
             } else {
                 printEmptyLane(raceTrackBuilder);
             }
