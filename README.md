@@ -22,14 +22,18 @@ Compile the source code in the following order:
 
 javac Race.java
 javac GUI.java
+javac main.java
 
 #### Run the program:
 
-java GUI
+Run the following in the terminal:
+
+java main
+
 The program's graphical user interface (GUI) will open, allowing you to interact with the horse race betting system.
 
-Add customized horses with unique names and statistics
-View detailed information about each horse, including their speed, stamina, and other attributes
-Place bets on horses before the race begins
-Customize the racing track by adjusting the length, obstacles, and other factors
-Simulate horse races and see the results
+Add customized horses with unique names and statistics.
+View detailed information about each horse, including their average finishing position, number of wins and more.
+Place bets on horses before the race begins.
+Customize the racing track by adjusting the length, type of fence and track color.
+Simulate horse races and see the results.
