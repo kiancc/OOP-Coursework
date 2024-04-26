@@ -18,8 +18,8 @@ public class GUI extends JFrame implements RaceListener {
     private ArrayList<Horse> horses;
     private TrackCustomisation customisation;
     private Color customBackgroundColor;
+    private JLabel winnerLabel;
     private JTextArea raceTrackTextArea;
-    private JTextArea winnerMsg;
     private JButton customiseTrackButton;
     private JButton startRaceButton;
     private JButton customiseHorseButton;
@@ -30,10 +30,6 @@ public class GUI extends JFrame implements RaceListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
         setLayout(new BorderLayout());
-
-        winnerMsg = new JTextArea("");
-        
-        add(winnerMsg);
 
         customTrackBoundary = '=';
         customRaceLength = 30;
@@ -56,12 +52,15 @@ public class GUI extends JFrame implements RaceListener {
 
         addHorsesToRace(race);
 
+        winnerLabel = new JLabel("");
+
         // Create the components
         JPanel trackRacePanel = new JPanel();
         raceTrackTextArea = new JTextArea(10, customRaceLength);
         raceTrackTextArea.setEditable(false);
         raceTrackTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        trackRacePanel.add(raceTrackTextArea);
+        trackRacePanel.add(raceTrackTextArea, BorderLayout.CENTER);
+        trackRacePanel.add(winnerLabel, BorderLayout.SOUTH);
         add(trackRacePanel, BorderLayout.CENTER);
 
         initialiseRace();
@@ -86,6 +85,8 @@ public class GUI extends JFrame implements RaceListener {
         bettingStaisticsButton = new JButton("Betting & Statistics");
         bettingStaisticsButton.addActionListener(new BettingStatisticsListener());
         buttonPanel.add(bettingStaisticsButton);
+
+        
 
         race.addRaceListener(this);
     }
@@ -263,17 +264,6 @@ public class GUI extends JFrame implements RaceListener {
         JTextField horseSymbolField = new JTextField("");
         customisationPanel.add(horseSymbolLabel);
         customisationPanel.add(horseSymbolField);
-        /*
-        JLabel horseColorLabel = new JLabel("Horse Color:");
-        JButton horseColorChooserButton = new JButton("Choose Color");
-        horseColorChooserButton.addActionListener(e -> {
-            Color color = JColorChooser.showDialog(GUI.this, "Choose Horse Color", horseColor);
-            if (color != null) {
-                horseColor = color;
-            }
-        });
-        customisationPanel.add(horseColorLabel);
-        customisationPanel.add(horseColorChooserButton);*/
 
         int result = JOptionPane.showConfirmDialog(GUI.this, customisationPanel, "Customize Horse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
@@ -395,14 +385,12 @@ public class GUI extends JFrame implements RaceListener {
         public void actionPerformed(ActionEvent e) {
             startRaceButton.setEnabled(false);
             applyCustomisation();
-            winnerMsg.setText("");
-            //applyBet();
+            winnerLabel.setText("");
             Thread raceThread = new Thread(() -> {
                 try {
                     race.startRace();
                     updateRaceTrack();
                     if (!race.getWinner().equals("")) {
-                        winnerMsg.setText("Winner is " + race.getWinner());
                         if (horseBet != null && race.getWinner().equals(horseBet)) {
                             wallet += betAmount;
                         }
@@ -425,6 +413,11 @@ public class GUI extends JFrame implements RaceListener {
 
         @Override
     public void onRaceFinished() {
+        if (!race.getWinner().isEmpty()) {
+            winnerLabel.setText("Winner: " + race.getWinner());
+        } else {
+            winnerLabel.setText("No winner");
+        }
         enableStartRaceButton();
     }
 
