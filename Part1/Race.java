@@ -85,6 +85,10 @@ public class Race
                 TimeUnit.MILLISECONDS.sleep(100);
             }catch(Exception e){}
         }
+
+        if (hasAllFallen()) {
+            System.out.println("All the horses have fallen.");
+        }
     }
 
     /**
@@ -218,8 +222,8 @@ public class Race
      * checks if all the horses have fallen in the race
      */
     private boolean hasAllFallen() {
+        
         if (numFallen == numHorses) {
-            System.out.println("All the horses have fallen.");
             return true;
         }
         return false;
